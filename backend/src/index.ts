@@ -14,7 +14,7 @@ app.use(authMiddleware);
 
 // }))
 
-app.get<>("/", (req, res) => {
+app.get("/", (req, res) => {
     res.send("Express + TypeScript Server");
 });
 

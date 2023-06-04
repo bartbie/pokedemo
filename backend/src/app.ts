@@ -33,7 +33,7 @@ export type TypedRequest<
  */
 export type TypedHandler<
     ReqBody = Record<string, unknown>,
-    Res = Record<string, unknown>,
+    Res = Record<string, unknown> | string,
     QueryString = Record<string, unknown>,
     RequestType extends TypedRequest<ReqBody, QueryString> = TypedRequest<
         ReqBody,
@@ -49,9 +49,10 @@ export type TypedHandler<
  * function type that allows to pass custom Handler, Requests, or Request's bodies and Responses as type parameters
  */
 export interface PathHandlerTaker<Return> {
+    (path: PathParam, handler: TypedHandler): Return;
     <
         RH extends TypedHandler<Req, Res, Query, RT>,
-        RT extends TypedRequest<Req, Query> = any, // hacky but seems to work lol (never also seems to work)
+        RT extends TypedRequest<Req, Query> = never, // hacky but seems to work lol
         Req = Record<string, unknown>,
         Res = Record<string, unknown>,
         Query = Record<string, unknown>
@@ -72,15 +73,15 @@ export interface PathHandlerTaker<Return> {
         path: PathParam,
         handler: TypedHandler<Req, Res>
     ): Return;
-    (path: PathParam, handler: TypedHandler): Return;
 }
 
 export interface UseHandlerTaker<Return> {
     // there is certainly a way to not repeat ourselves
     // but i'm too dumb to find it
+    (handler: TypedHandler): Return;
     <
         RH extends TypedHandler<Req, Res, Query, RT>,
-        RT extends TypedRequest<Req, Query> = any, // hacky but seems to work lol (never also seems to work)
+        RT extends TypedRequest<Req, Query> = never, // hacky but seems to work lol
         Req = Record<string, unknown>,
         Res = Record<string, unknown>,
         Query = Record<string, unknown>
@@ -98,7 +99,6 @@ export interface UseHandlerTaker<Return> {
     <Req = Record<string, unknown>, Res = Record<string, unknown>>(
         handler: TypedHandler<Req, Res>
     ): Return;
-    (handler: TypedHandler): Return;
 }
 
 type RestMethods = {
@@ -142,18 +142,21 @@ export const App = (): App => {
     return app as App;
 };
 
-// type testing
-import { authMiddleware, ProtectedHandler, ProtectedRequest } from "./lib/auth";
-const app = App();
-app.get(".", authMiddleware);
-app.get<ProtectedRequest>(".", (req, res, next) => {
-    req.context.user = "bart";
-});
-app.get<{ id: 1 }, { answer: "it works!" }>(".", (req, res, next) => {
-    req.body.id;
-    res.json({ answer: "it works!" });
-});
-app.get<ProtectedHandler>(".", (req, res, next) => {
-    req.context.user;
-});
-app.use(authMiddleware);
+/* type testing */
+// import { authMiddleware, ProtectedHandler, ProtectedRequest } from "./lib/auth";
+// const app = App();
+// app.get(".", (req, res, next) => {
+//     // req.context <- doesn't exist!
+// });
+// app.get(".", authMiddleware);
+// app.get<ProtectedRequest>(".", (req, res, next) => {
+//     req.context.user = "bart";
+// });
+// app.get<{ id: 1 }, { answer: "it works!" }>(".", (req, res, next) => {
+//     req.body.id;
+//     res.json({ answer: "it works!" });
+// });
+// app.get<ProtectedHandler>(".", (req, res, next) => {
+//     req.context.user;
+// });
+// app.use(authMiddleware);
