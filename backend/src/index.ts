@@ -6,14 +6,6 @@ import {App, TypedHandler} from "./app";
 const app = App();
 const PORT = env.PORT;
 
-const test: TypedHandler = (req, res, next) => {};
-
-app.use(authMiddleware);
-
-// app.use(H<ProtectedHandler>((req, res, next) => {
-
-// }))
-
 app.get("/", (req, res) => {
     res.send("Express + TypeScript Server");
 });
@@ -21,5 +13,3 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
     console.log(`⚡️[server]: Server is running at http://localhost:${PORT}`);
 });
-
-app.get([".", /./], function() {})

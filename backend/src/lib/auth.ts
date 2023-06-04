@@ -15,7 +15,7 @@ export type ProtectedRequest<
 
 export type ProtectedHandler<
     req = Record<string, unknown>,
-    res = Record<string, unknown>,
+    res = Record<string, unknown> | string,
     query = Record<string, unknown>
 > = TypedHandler<req, res, query, ProtectedRequest<req, query>>;
 

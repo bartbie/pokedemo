@@ -54,7 +54,7 @@ export interface PathHandlerTaker<Return> {
         RH extends TypedHandler<Req, Res, Query, RT>,
         RT extends TypedRequest<Req, Query> = never, // hacky but seems to work lol
         Req = Record<string, unknown>,
-        Res = Record<string, unknown>,
+        Res = Record<string, unknown> | string,
         Query = Record<string, unknown>
     >(
         path: PathParam,
@@ -63,7 +63,7 @@ export interface PathHandlerTaker<Return> {
     <
         RT extends TypedRequest<Req, Query>,
         Req = Record<string, unknown>,
-        Res = Record<string, unknown>,
+        Res = Record<string, unknown> | string,
         Query = Record<string, unknown>
     >(
         path: PathParam,
@@ -83,7 +83,7 @@ export interface UseHandlerTaker<Return> {
         RH extends TypedHandler<Req, Res, Query, RT>,
         RT extends TypedRequest<Req, Query> = never, // hacky but seems to work lol
         Req = Record<string, unknown>,
-        Res = Record<string, unknown>,
+        Res = Record<string, unknown> | string,
         Query = Record<string, unknown>
     >(
         handler: RH
@@ -91,7 +91,7 @@ export interface UseHandlerTaker<Return> {
     <
         RT extends TypedRequest<Req, Query>,
         Req = Record<string, unknown>,
-        Res = Record<string, unknown>,
+        Res = Record<string, unknown> | string,
         Query = Record<string, unknown>
     >(
         handler: TypedHandler<Req, Res, Query, RT>
@@ -143,20 +143,22 @@ export const App = (): App => {
 };
 
 /* type testing */
-// import { authMiddleware, ProtectedHandler, ProtectedRequest } from "./lib/auth";
-// const app = App();
-// app.get(".", (req, res, next) => {
-//     // req.context <- doesn't exist!
-// });
-// app.get(".", authMiddleware);
-// app.get<ProtectedRequest>(".", (req, res, next) => {
-//     req.context.user = "bart";
-// });
-// app.get<{ id: 1 }, { answer: "it works!" }>(".", (req, res, next) => {
-//     req.body.id;
-//     res.json({ answer: "it works!" });
-// });
-// app.get<ProtectedHandler>(".", (req, res, next) => {
-//     req.context.user;
-// });
-// app.use(authMiddleware);
+import { authMiddleware, ProtectedHandler, ProtectedRequest } from "./lib/auth";
+const app = App();
+app.get(".", (req, res, next) => {
+    // req.context <- doesn't exist!
+});
+app.get(".", authMiddleware);
+app.get<ProtectedRequest>(".", (req, res, next) => {
+    req.context.user = "bart";
+    res.send("test");
+});
+app.get<{ id: 1 }, { answer: "it works!" }>(".", (req, res, next) => {
+    req.body.id;
+    res.json({ answer: "it works!" });
+});
+app.get<ProtectedHandler>(".", (req, res, next) => {
+    req.context.user;
+    res.send("test");
+});
+app.use(authMiddleware);
