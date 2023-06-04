@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
-import { env } from "./env";
-import { BaseMiddleware, TypedRequest, TypedMiddleware } from './types';
+import { env } from "../env";
+import { TypedHandler, TypedRequest } from "../app";
 
 export type Context = {
     user: string | jwt.JwtPayload;
@@ -10,14 +10,14 @@ export type ProtectedRequest<
     ReqBody = Record<string, unknown>,
     QueryString = Record<string, unknown>
 > = TypedRequest<ReqBody, QueryString> & {
-    context: Context
+    context: Context;
 };
 
 export type ProtectedHandler<
     req = Record<string, unknown>,
     res = Record<string, unknown>,
     query = Record<string, unknown>
-> = BaseMiddleware<ProtectedRequest<req, query>, req, res, query>;
+> = TypedHandler<req, res, query, ProtectedRequest<req, query>>;
 
 export const authMiddleware: ProtectedHandler = (req, res, next) => {
     const authHeader = req.headers["authorization"];

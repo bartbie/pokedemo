@@ -23,9 +23,10 @@
     // uncomment if JS will be ever needed
     // "allowJs": true,
     // "checkJs": true,
-    "baseUrl": ".",
-    "paths": {
-      "~/*": ["./src/*"]
-    }
-  }
+    // "baseUrl": ".",
+    // "paths": {
+    //   "~/*": ["./src/*"]
+    // }
+  },
+  // "include": ["./src/**/*"]
 }
