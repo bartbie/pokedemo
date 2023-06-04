@@ -143,22 +143,22 @@ export const App = (): App => {
 };
 
 /* type testing */
-import { authMiddleware, ProtectedHandler, ProtectedRequest } from "./lib/auth";
-const app = App();
-app.get(".", (req, res, next) => {
-    // req.context <- doesn't exist!
-});
-app.get(".", authMiddleware);
-app.get<ProtectedRequest>(".", (req, res, next) => {
-    req.context.user = "bart";
-    res.send("test");
-});
-app.get<{ id: 1 }, { answer: "it works!" }>(".", (req, res, next) => {
-    req.body.id;
-    res.json({ answer: "it works!" });
-});
-app.get<ProtectedHandler>(".", (req, res, next) => {
-    req.context.user;
-    res.send("test");
-});
-app.use(authMiddleware);
+// import { authMiddleware, ProtectedHandler, ProtectedRequest } from "./lib/auth";
+// const app = App();
+// app.get(".", (req, res, next) => {
+//     // req.context <- doesn't exist!
+// });
+// app.get(".", authMiddleware);
+// app.get<ProtectedRequest>(".", (req, res, next) => {
+//     req.context.user = "bart";
+//     res.send("test");
+// });
+// app.get<{ id: 1 }, { answer: "it works!" }>(".", (req, res, next) => {
+//     req.body.id;
+//     res.json({ answer: "it works!" });
+// });
+// app.get<ProtectedHandler>(".", (req, res, next) => {
+//     req.context.user;
+//     res.send("test");
+// });
+// app.use(authMiddleware);
