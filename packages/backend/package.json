@@ -10,6 +10,6 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "@pokedemo/common": "^1.0.0"
+        "@pokedemo/common": "^0.1.0"
     }
 }
