@@ -3,11 +3,13 @@
     "version": "0.1.0",
     "description": "",
     "main": "dist/index.js",
-    "devDependencies": {},
     "scripts": {
         "build": "npx tsc --build"
     },
     "keywords": [],
     "author": "",
-    "license": "ISC"
+    "license": "ISC",
+    "dependencies": {
+        "zod": "^3.21.4"
+    }
 }
