@@ -2,7 +2,10 @@
     "name": "@pokedemo/common",
     "version": "0.2.0",
     "description": "",
-    "main": "dist/index.js",
+    "exports": {
+        ".": "./dist/index.js",
+        "./": "./dist/"
+    },
     "scripts": {
         "build": "npx tsc --build"
     },

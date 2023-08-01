@@ -19,6 +19,6 @@
         "vite": "^4.4.5"
     },
     "dependencies": {
-        "@pokedemo/common": "^0.1.0"
+        "@pokedemo/common": "file:../common"
     }
 }
