@@ -3,8 +3,8 @@
     "version": "0.2.0",
     "description": "",
     "exports": {
-        ".": "./dist/index.js",
-        "./": "./dist/"
+        "./api": "./dist/api/index.js",
+        "./utils": "./dist/utils/index.js"
     },
     "scripts": {
         "build": "npx tsc --build"

@@ -1,7 +1,21 @@
 {
+    "$schema": "https://json.schemastore.org/tsconfig",
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "target": "ES2022",
+        "lib": [
+            "ES2023"
+        ],
+        "esModuleInterop": true,
         "rootDir": "src",
         "outDir": "dist"
-    }
+    },
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
 }

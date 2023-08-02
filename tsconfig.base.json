@@ -1,15 +1,14 @@
 {
+    "$schema": "https://json.schemastore.org/tsconfig",
     "compilerOptions": {
         "incremental": true,
-        "target": "es2020",
-        "module": "commonjs",
+        "composite": true,
         "declaration": true,
         "sourceMap": true,
-        "strict": true,
-        "moduleResolution": "node",
-        "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "composite": true
+        //
+        "strict": true,
+        "noFallthroughCasesInSwitch": true
     }
 }
