@@ -1,20 +1,16 @@
 {
     "name": "pokedemo",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "description": "",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "keywords": [],
-    "author": "",
+    "scripts": {},
     "license": "ISC",
-    "workspaces": [
-        "packages/backend",
-        "packages/frontend",
-        "packages/common"
-    ],
+    "private": true,
+    "type": "module",
+    "packageManager": "pnpm@8.6.11",
+    "engines": {
+        "pnpm": "^8.0.0"
+    },
     "devDependencies": {
-        "typescript": "^5.1.6"
+        "typescript": "^5.0.2"
     }
 }

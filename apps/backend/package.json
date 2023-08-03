@@ -15,7 +15,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "@pokedemo/common": "file:../common"
+        "@pokedemo/common": "workspace:*"
     },
     "devDependencies": {
         "concurrently": "^8.2.0",

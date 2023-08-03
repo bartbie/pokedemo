@@ -30,7 +30,7 @@ type okOverload = {
     (ok?: undefined): Ok;
 };
 
-type errOverload<> = {
+type errOverload = {
     <T>(err: T): Err<T>;
     (err?: undefined): Err;
 };
@@ -40,7 +40,7 @@ export const ok: okOverload = <T>(ok?: T) => {
     return {
         success: true,
         data: ok,
-    }  as const;
+    } as const;
 };
 
 export const err: errOverload = <T>(err?: T) => {
