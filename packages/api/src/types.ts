@@ -1,4 +1,3 @@
-import { Branded } from "../utils";
 import { z } from "zod";
 
 export const rolesArr = ["USER", "ADMIN"] as const;

@@ -1,4 +1,4 @@
-import { ok, type Result } from "../utils";
+import { ok, type Result } from "@pokedemo/utils";
 import type * as t from "./types";
 
 // --- Error strings

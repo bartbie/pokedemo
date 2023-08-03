@@ -6,15 +6,17 @@
         "lib": [
             "ES2023"
         ],
-        "moduleResolution": "NodeNext",
+        "moduleResolution": "node",
         "esModuleInterop": true,
         "rootDir": "src",
-        "outDir": "dist"
+        "outDir": "dist",
+        "skipLibCheck": true,
+        "preserveSymlinks": false
     },
     "include": [
         "src/**/*.ts"
     ],
     "exclude": [
         "node_modules"
-    ],
+    ]
 }

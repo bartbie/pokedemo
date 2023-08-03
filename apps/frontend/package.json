@@ -19,6 +19,7 @@
         "vite": "^4.4.5"
     },
     "dependencies": {
-        "@pokedemo/common": "workspace:*"
+        "@pokedemo/api": "workspace:*",
+        "@pokedemo/utils": "workspace:*"
     }
 }

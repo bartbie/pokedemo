@@ -1,5 +1,5 @@
 {
-    "name": "@pokedemo/common",
+    "name": "@pokedemo/utils",
     "private": true,
     "version": "0.3.0",
     "type": "module",
@@ -8,23 +8,13 @@
         "build": "tsc && vite build",
         "preview": "vite preview"
     },
-    "main": "./dist/index.cjs.js",
     "module": "./dist/index.es.js",
+    "main": "./dist/index.umd.js",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
             "import": "./dist/index.es.js",
-            "require": "./dist/index.cjs.js"
-        },
-        "./api": {
-            "types": "./dist/api/index.d.ts",
-            "import": "./dist/api/index.es.js",
-            "require": "./dist/api/index.cjs.js"
-        },
-        "./utils": {
-            "types": "./dist/utils/index.d.ts",
-            "import": "./dist/utils/index.es.js",
-            "require": "./dist/utils/index.cjs.js"
+            "require": "./dist/index.umd.js"
         }
     },
     "dependencies": {

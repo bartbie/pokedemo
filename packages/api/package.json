@@ -1,0 +1,30 @@
+{
+    "name": "@pokedemo/api",
+    "private": true,
+    "version": "0.3.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview"
+    },
+    "module": "./dist/index.es.js",
+    "main": "./dist/index.umd.js",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.es.js",
+            "require": "./dist/index.umd.js"
+        }
+    },
+    "dependencies": {
+        "zod": "^3.21.4",
+        "@pokedemo/utils": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/node": "^20.4.6",
+        "typescript": "^5.0.2",
+        "vite": "^4.4.5",
+        "vite-plugin-dts": "^3.4.0"
+    }
+}

@@ -3,7 +3,6 @@
     "version": "1.0.0",
     "description": "",
     "main": "dist/index.js",
-    "type": "module",
     "scripts": {
         "build": "tsc",
         "build:watch": "tsc --watch",
@@ -15,7 +14,8 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "@pokedemo/common": "workspace:*"
+        "@pokedemo/api": "workspace:*",
+        "@pokedemo/utils": "workspace:*"
     },
     "devDependencies": {
         "@types/node": "^20.4.6",
