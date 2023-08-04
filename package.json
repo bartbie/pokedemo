@@ -2,7 +2,10 @@
     "name": "pokedemo",
     "version": "0.0.1",
     "description": "",
-    "scripts": {},
+    "scripts": {
+        "build:packages": "pnpm run --filter=./packages/* build",
+        "build:backend": "pnpm run --dir apps/backend build"
+    },
     "license": "ISC",
     "private": true,
     "type": "module",

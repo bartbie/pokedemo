@@ -10,7 +10,8 @@ export default defineConfig({
             formats: ["es", "umd"],
             name: 'utils',
             entry: resolve(__dirname, 'src/index.ts'),
-            fileName: (fmt, entryName) => `${entryName}.${fmt}.js`,
+            fileName: "index",
+            // fileName: (fmt, entryName) => `${entryName}.${fmt}.js`,
         },
     },
 })

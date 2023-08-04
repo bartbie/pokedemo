@@ -9,7 +9,8 @@ export default defineConfig({
         lib: {
             name: 'api',
             entry: resolve(__dirname, 'src/index.ts'),
-            fileName: (fmt, entryName) => `${entryName}.${fmt}.js`,
+            fileName: 'index',
+            // fileName: (fmt, entryName) => `${entryName}.${fmt}.js`,
         },
     },
 })
