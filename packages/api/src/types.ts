@@ -30,7 +30,7 @@ export type PokemonType = z.infer<typeof pokemonTypeSchema>;
 export const roleSchema = z.enum(rolesArr);
 export type Role = z.infer<typeof roleSchema>;
 
-export const pokemonIdSchema = z.number().positive().brand<"PokemonId">();
+export const pokemonIdSchema = z.number().positive()/*.brand<"PokemonId">()*/;
 export type PokemonId = z.infer<typeof pokemonIdSchema>;
 
 // no need for now
@@ -62,10 +62,10 @@ export const pokemonSchema = z
 
 export type Pokemon = z.infer<typeof pokemonSchema>;
 
-export const userIdSchema = z.string().cuid2().brand<"UserId">();
+export const userIdSchema = z.string().cuid2()/*.brand<"UserId">()*/;
 export type UserId = z.infer<typeof userIdSchema>;
 
-export const emailSchema = z.string().email().brand<"Email">();
+export const emailSchema = z.string().email()/*.brand<"Email">()*/;
 export type Email = z.infer<typeof emailSchema>;
 
 export const userCredentialsSchema = z.object({
@@ -81,7 +81,7 @@ export const userSchema = z
         role: roleSchema,
         email: emailSchema,
     })
-    .brand<"User">();
+// .brand<"User">();
 export type User = z.infer<typeof userSchema>;
 
 export const fullUserSchema = z
@@ -90,7 +90,7 @@ export const fullUserSchema = z
         role: roleSchema,
     })
     .and(userCredentialsSchema)
-    .brand<"FullUser">();
+// .brand<"FullUser">();
 export type FullUser = z.infer<typeof fullUserSchema>;
 
 export const authTokenSchema = z.object({

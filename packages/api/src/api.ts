@@ -13,29 +13,36 @@ export const Errors = {
     adminNeeded: "You're not allowed to do that!",
 } as const satisfies Record<string, string>;
 
+export const HealthCheckMsg = "Server is running!";
+
 // --- helper types
 
-type Err = typeof Errors;
-
-type ResponseOnlySchema<R extends Result> = {
-    readonly response: R;
-};
-
-type EndpointSchema<B extends Record<string, any>, R extends Result> = {
+export type EndpointSchema<B extends Record<string, any>, R extends Result> = {
     readonly request: B;
-} & ResponseOnlySchema<R>;
+    readonly response: R;
+}
+
+export type ResponseOnlySchema<R extends Result> = {
+    readonly response: R;
+}
 
 type Endpoint<schema extends EndpointSchema<any, any>> = schema;
+
 type OnlyResEndpoint<schema extends ResponseOnlySchema<any>> = schema;
+
 type GETEndpoint<schema extends ResponseOnlySchema<any>> = schema;
 
 type TokenBody = {
     token: string;
 };
 
+type Err = typeof Errors;
 // --- API contr act type
 
 export type API = {
+    "/healthcheck": {
+        GET: Result<typeof HealthCheckMsg, never>
+    }
     "/pokemons": {
         GET: GETEndpoint<{
             response: Result<Required<t.Pokemon>[], never>;
