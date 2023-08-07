@@ -1,4 +1,4 @@
-import { ok, type Result } from "@pokedemo/utils";
+import { ok, type Result, Branded } from "@pokedemo/utils";
 import type * as t from "./types";
 
 // --- Error strings
@@ -15,22 +15,35 @@ export const Errors = {
 
 export const HealthCheckMsg = "Server is running!";
 
+//INFO: they should have better brands than just string, but it was breaking on backend
+export type Endpoint<B extends Record<string, any>, R extends Result> = {
+    readonly request: B;
+    readonly response: R;
+    __type: "Endpoint";
+}
+
+export type ResOnlyEndpoint<R extends Result> = {
+    readonly response: R;
+    __type: "ResOnlyEndpoint";
+}
+
 // --- helper types
 
-export type EndpointSchema<B extends Record<string, any>, R extends Result> = {
+type EndpointType<B extends Record<string, any>, R extends Result> = {
     readonly request: B;
     readonly response: R;
 }
 
-export type ResponseOnlySchema<R extends Result> = {
+type ResponseOnlyEndpointType<R extends Result> = {
     readonly response: R;
 }
 
-type Endpoint<schema extends EndpointSchema<any, any>> = schema;
+type _Endpoint<schema extends EndpointType<any, any>> = Endpoint<schema["request"], schema["response"]>
 
-type OnlyResEndpoint<schema extends ResponseOnlySchema<any>> = schema;
+type _ResOnlyEndpoint<schema extends ResponseOnlyEndpointType<any>> = ResOnlyEndpoint<schema["response"]>
 
-type GETEndpoint<schema extends ResponseOnlySchema<any>> = schema;
+type _GETEndpoint<schema extends ResponseOnlyEndpointType<any>> = _ResOnlyEndpoint<schema>;
+
 
 type TokenBody = {
     token: string;
@@ -39,45 +52,48 @@ type TokenBody = {
 type Err = typeof Errors;
 // --- API contr act type
 
+
 export type API = {
     "/healthcheck": {
-        GET: Result<typeof HealthCheckMsg, never>
+        GET: _GETEndpoint<{
+            response: Result<typeof HealthCheckMsg, never>
+        }>
     }
     "/pokemons": {
-        GET: GETEndpoint<{
+        GET: _GETEndpoint<{
             response: Result<Required<t.Pokemon>[], never>;
         }>;
-        POST: Endpoint<{
+        POST: _Endpoint<{
             request: t.Pokemon;
             response: Result<void, Err["wrongBody" | "adminNeeded"]>;
         }>;
         "/:id": {
-            GET: GETEndpoint<{
+            GET: _GETEndpoint<{
                 response: Result<Required<t.Pokemon>, Err["wrongId"]>;
             }>;
-            PATCH: Endpoint<{
+            PATCH: _Endpoint<{
                 request: t.Pokemon;
                 response: Required<
                     Result<void, Err["wrongId" | "wrongBody" | "adminNeeded"]>
                 >;
             }>;
-            DELETE: OnlyResEndpoint<{
+            DELETE: _ResOnlyEndpoint<{
                 response: Result<void, Err["wrongId" | "adminNeeded"]>;
             }>;
         };
         "/custom": {
-            GET: GETEndpoint<{
+            GET: _GETEndpoint<{
                 response: Result<Required<t.Pokemon>[], never>;
             }>;
-            POST: Endpoint<{
+            POST: _Endpoint<{
                 request: t.Pokemon;
                 response: Result<void, Err["wrongBody" | "adminNeeded"]>;
             }>;
             "/:id": {
-                GET: GETEndpoint<{
+                GET: _GETEndpoint<{
                     response: Result<Required<t.Pokemon>, Err["wrongId"]>;
                 }>;
-                PATCH: Endpoint<{
+                PATCH: _Endpoint<{
                     request: t.Pokemon;
                     response: Required<
                         Result<
@@ -86,7 +102,7 @@ export type API = {
                         >
                     >;
                 }>;
-                DELETE: OnlyResEndpoint<{
+                DELETE: _ResOnlyEndpoint<{
                     response: Result<void, Err["wrongId" | "adminNeeded"]>;
                 }>;
             };
@@ -94,13 +110,13 @@ export type API = {
     };
     "/auth": {
         "/signup": {
-            POST: Endpoint<{
+            POST: _Endpoint<{
                 request: t.UserCredentials;
                 response: Result<t.User, Err["wrongBody" | "emailTaken"]>;
             }>;
         };
         "/login": {
-            POST: Endpoint<{
+            POST: _Endpoint<{
                 request: t.UserCredentials;
                 response: Result<
                     t.User,
@@ -109,13 +125,13 @@ export type API = {
             }>;
         };
         "/verify": {
-            POST: Endpoint<{
+            POST: _Endpoint<{
                 request: TokenBody;
                 response: Result<t.User, Err["wrongToken"]>;
             }>;
         };
         "/logout": {
-            POST: Endpoint<{
+            POST: _Endpoint<{
                 request: TokenBody;
                 response: Result<void, Err["wrongToken"]>;
             }>;
@@ -150,11 +166,11 @@ export type API = {
     // };
     "/me": {
         "/pokemons": {
-            GET: GETEndpoint<{
+            GET: _GETEndpoint<{
                 response: Result<Required<t.Pokemon>[], never>;
             }>;
             /** adds new *existing* pokemons to user's collection */
-            PUT: Endpoint<{
+            PUT: _Endpoint<{
                 request: { pokemons: { id: t.PokemonId[]; favorite: boolean } };
                 response: Result<
                     void,
@@ -163,7 +179,7 @@ export type API = {
                 >;
             }>;
             /** deletes pokemon from user's collection */
-            DELETE: Endpoint<{
+            DELETE: _Endpoint<{
                 request: { id: t.PokemonId[] };
                 response: Result<
                     void,
@@ -172,11 +188,11 @@ export type API = {
                 >;
             }>;
             "/favorites": {
-                GET: GETEndpoint<{
+                GET: _GETEndpoint<{
                     response: Result<Required<t.Pokemon>[], never>;
                 }>;
                 /** deletes pokemons from user's favorites */
-                DELETE: Endpoint<{
+                DELETE: _Endpoint<{
                     request: { id: t.PokemonId[] };
                     response: Result<
                         void,
@@ -185,7 +201,7 @@ export type API = {
                     >;
                 }>;
                 /** adds each pokemon to favorites */
-                PUT: Endpoint<{
+                PUT: _Endpoint<{
                     request: { id: t.PokemonId[] };
                     response: Result<
                         void,
@@ -196,11 +212,11 @@ export type API = {
                 /** manipulate 'favoriteness' of specific pokemon */
                 "/:id": {
                     /** add to favorites */
-                    POST: OnlyResEndpoint<{
+                    POST: _ResOnlyEndpoint<{
                         response: Result<void, Err["wrongId"]>;
                     }>;
                     /** delete from favorites */
-                    DELETE: OnlyResEndpoint<{
+                    DELETE: _ResOnlyEndpoint<{
                         response: Result<void, Err["wrongId"]>;
                     }>;
                 };

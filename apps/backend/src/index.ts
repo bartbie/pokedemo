@@ -1,27 +1,34 @@
-import { default as express, json } from "express";
-import pokemonRouter from "./routers/pokemons-router";
+import "module-alias/register"; // set up path aliases
+import { Router, default as express, json } from "express";
 import { API, HealthCheckMsg } from "@pokedemo/api";
+import pokemonRouter from "./routers/pokemons-router";
 import { ok } from "@pokedemo/utils";
-import { makeGetEndpoint } from "./utils";
+import { makeGetEndpoint } from "$lib/endpoint";
+import { env } from "$env";
+import { setupDB } from "$lib/db/setup";
 
-const PORT = 3000;
-const app = express()
-    .use(json())
-    .get("/", (_, res) => res.send("Pokedemo server."))
-    .get(
-        "/api/healthcheck",
-        makeGetEndpoint<API["/healthcheck"]["GET"]>((_, res) => {
-            res.status(200).json(ok(HealthCheckMsg));
-        })
-    );
+const APIRouter = Router().use("/pokemons", pokemonRouter);
 
-// Routers
+const server = () => {
+    const PORT = env.PORT;
+    const app = express()
+        .use(json())
+        .get("/", (_, res) => res.send("Pokedemo server."))
+        .get(
+            "/api/healthcheck",
+            makeGetEndpoint<API["/healthcheck"]["GET"]>((_, res) => {
+                res.status(200).json(ok(HealthCheckMsg));
+            })
+        )
+        .use("/api", APIRouter)
+        .listen(PORT, () => {
+            console.log(
+                `⚡️[server]: Server is running at http://localhost:${PORT}`
+            );
+        });
+};
 
-app.use("/api/pokemons", pokemonRouter);
-
-app.listen(PORT, () => {
-    console.log(
-        // TODO: make localhost only show up on dev
-        `⚡️[server]: Server is running at http://localhost:${PORT}`
-    );
-});
+(async () => {
+    await setupDB();
+    server();
+})();
