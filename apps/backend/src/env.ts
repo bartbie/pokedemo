@@ -8,8 +8,7 @@ dotenv.config();
 
 const ENV_SCHEMA = z.object({
     PORT: z.coerce.number(),
-    // TODO: add when doing auth
-    // AUTH_SECRET: z.string().min(64),
+    AUTH_SECRET: z.string().min(64),
     DATABASE_URL: z.string().nonempty(),
     NODE_ENV: z
         .enum(["development", "production"])

@@ -3,14 +3,16 @@ import "module-alias/register"; // set up path aliases
 import { default as express, json, Router } from "express";
 import { API, HealthCheckMsg } from "@pokedemo/api";
 import { ok } from "@pokedemo/utils";
-import { makeGetEndpoint } from "$lib/endpoint";
 import { env } from "$env";
+import { makeGetEndpoint } from "$lib/endpoint";
 import { setupDB } from "$lib/db/setup";
 import { logger, logMiddleware } from "$lib/log";
-import pokemonRouter from "./routers/pokemons-router";
+import { pokemonRouter } from "./routers/pokemons-router";
+import { authRouter } from "routers/auth-router";
 
 const APIRouter = Router()
     .use("/pokemons", pokemonRouter)
+    .use("/auth", authRouter)
     .get(
         "/healthcheck",
         makeGetEndpoint<API["/healthcheck"]["GET"]>((_, res) => {

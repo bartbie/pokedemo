@@ -98,3 +98,9 @@ export const authTokenSchema = z.object({
     email: emailSchema,
 });
 export type AuthToken = z.infer<typeof authTokenSchema>;
+
+export const tokenRequestSchema = z.object({
+    token: z.string()
+})
+
+export type TokenRequest = z.infer<typeof tokenRequestSchema>;

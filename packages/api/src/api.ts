@@ -1,4 +1,4 @@
-import { ok, type Result, Branded } from "@pokedemo/utils";
+import { type Result } from "@pokedemo/utils";
 import type * as t from "./types";
 
 // --- Error strings
@@ -44,10 +44,6 @@ type _ResOnlyEndpoint<schema extends ResponseOnlyEndpointType<any>> = ResOnlyEnd
 
 type _GETEndpoint<schema extends ResponseOnlyEndpointType<any>> = _ResOnlyEndpoint<schema>;
 
-
-type TokenBody = {
-    token: string;
-};
 
 type Err = typeof Errors;
 // --- API contr act type
@@ -126,13 +122,13 @@ export type API = {
         };
         "/verify": {
             POST: _Endpoint<{
-                request: TokenBody;
+                request: t.TokenRequest;
                 response: Result<t.User, Err["wrongToken"]>;
             }>;
         };
         "/logout": {
             POST: _Endpoint<{
-                request: TokenBody;
+                request: t.TokenRequest;
                 response: Result<void, Err["wrongToken"]>;
             }>;
         };
