@@ -1,0 +1,8 @@
+{
+    "ext": "ts,json,env,sql",
+    "watch": [
+        "sql/",
+        ".env",
+        "src/**/*"
+    ]
+}
