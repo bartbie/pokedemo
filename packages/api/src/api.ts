@@ -61,7 +61,7 @@ export type API = {
         }>;
         POST: _Endpoint<{
             request: t.Pokemon;
-            response: Result<void, Err["wrongBody" | "adminNeeded"]>;
+            response: Result<Required<t.Pokemon>, Err["wrongBody" | "adminNeeded"]>;
         }>;
         "/:id": {
             GET: _GETEndpoint<{
@@ -69,9 +69,8 @@ export type API = {
             }>;
             PATCH: _Endpoint<{
                 request: t.PatchPokemon;
-                response: Required<
-                    Result<void, Err["wrongId" | "wrongBody" | "adminNeeded"]>
-                >;
+                response:
+                Result<Required<t.Pokemon>, Err["wrongId" | "wrongBody" | "adminNeeded"]>;
             }>;
             DELETE: _ResOnlyEndpoint<{
                 response: Result<void, Err["wrongId" | "adminNeeded"]>;
@@ -104,18 +103,39 @@ export type API = {
             // };
         };
     };
+    "/users": {
+        GET: _GETEndpoint<{
+            response: Result<Required<t.User>[], Err["adminNeeded"]>
+        }>,
+        POST: _Endpoint<{
+            request: t.User,
+            response: Result<Required<t.User>, Err["wrongBody" | "wrongId" | "adminNeeded"]>
+        }>,
+        "/:id": {
+            GET: _GETEndpoint<{
+                response: Result<Required<t.User>, Err["wrongId" | "adminNeeded"]>
+            }>,
+            PATCH: _Endpoint<{
+                request: t.PatchUser;
+                response: Result<Required<t.User>, Err["wrongBody" | "wrongId" | "adminNeeded"]>
+            }>,
+            DELETE: _ResOnlyEndpoint<{
+                response: Result<void, Err["wrongBody" | "wrongId" | "adminNeeded"]>
+            }>;
+        };
+    };
     "/auth": {
         "/signup": {
             POST: _Endpoint<{
                 request: t.UserCredentials;
-                response: Result<t.User, Err["wrongBody" | "emailTaken"]>;
+                response: Result<Required<t.User>, Err["wrongBody" | "emailTaken"]>;
             }>;
         };
         "/login": {
             POST: _Endpoint<{
                 request: t.UserCredentials;
                 response: Result<
-                    t.User,
+                    Required<t.User>,
                     Err["wrongBody" | "emailNotExist" | "wrongPassword"]
                 >;
             }>;
@@ -123,7 +143,7 @@ export type API = {
         "/verify": {
             POST: _Endpoint<{
                 request: t.TokenRequest;
-                response: Result<t.User, Err["wrongToken"]>;
+                response: Result<Required<t.User>, Err["wrongToken"]>;
             }>;
         };
         "/logout": {
@@ -133,33 +153,6 @@ export type API = {
             }>;
         };
     };
-    // TODO figure out contact API
-    // "/contact": {
-    //     "/messages": {
-    //         GET: any;
-    //         POST: any;
-    //         "/:id": {
-    //             GET: any;
-    //         };
-    //         "/user": {
-    //             "/:id": {
-    //                 GET: any;
-    //             };
-    //         };
-    //     };
-    //     "/responses": {
-    //         GET: any;
-    //         POST: any;
-    //         "/:id": {
-    //             GET: any;
-    //         };
-    //         "/user": {
-    //             "/:id": {
-    //                 GET: any;
-    //             };
-    //         };
-    //     };
-    // };
     "/me": {
         "/pokemons": {
             GET: _GETEndpoint<{
@@ -219,4 +212,31 @@ export type API = {
             };
         };
     };
+    // TODO figure out contact API
+    // "/contact": {
+    //     "/messages": {
+    //         GET: any;
+    //         POST: any;
+    //         "/:id": {
+    //             GET: any;
+    //         };
+    //         "/user": {
+    //             "/:id": {
+    //                 GET: any;
+    //             };
+    //         };
+    //     };
+    //     "/responses": {
+    //         GET: any;
+    //         POST: any;
+    //         "/:id": {
+    //             GET: any;
+    //         };
+    //         "/user": {
+    //             "/:id": {
+    //                 GET: any;
+    //             };
+    //         };
+    //     };
+    // };
 };

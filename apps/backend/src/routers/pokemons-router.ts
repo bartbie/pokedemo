@@ -42,8 +42,12 @@ export const pokemonRouter = Router()
         makeEndpoint<PokeApi["POST"]>(pokemonSchema, async (req, res) => {
             const pokemon = exclude(req.body, ["id"]);
             try {
-                await sql`INSERT INTO pokemons VALUES ${sql(pokemon)};`;
-                return res.status(200).json(ok());
+                const newPokemon = (
+                    await sql<
+                        Required<Pokemon>[]
+                    >`INSERT INTO pokemons VALUES ${sql(pokemon)} RETURNING *;`
+                )[0];
+                return res.status(200).json(ok(newPokemon));
             } catch (e) {
                 req.log.error(e);
                 return res.status(200).json(err(Errors.wrongBody));
@@ -96,10 +100,14 @@ export const pokemonRouter = Router()
                 const id = req.params.id as number;
                 const pokemon = exclude(req.body, ["id"]);
                 try {
-                    await sql`UPDATE pokemons SET ${sql(
-                        pokemon
-                    )} WHERE id = ${id}`;
-                    return res.status(200).json(ok());
+                    const updatedPokemon = (
+                        await sql<
+                            Required<Pokemon>[]
+                        >`UPDATE pokemons SET ${sql(
+                            pokemon
+                        )} WHERE id = ${id} RETURNING *;`
+                    )[0];
+                    return res.status(200).json(ok(updatedPokemon));
                 } catch (e) {
                     req.log.error(e);
                     return res.status(400).json(err(Errors.wrongId));

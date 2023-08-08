@@ -86,7 +86,6 @@ export const userCredentialsSchema = z.object({
     email: emailSchema,
     password: z.string(),
 });
-export type UserCredentials = z.infer<typeof userCredentialsSchema>;
 
 // branded so these two + credentials won't get mixed up by mistake
 export const userSchema = z
@@ -96,7 +95,6 @@ export const userSchema = z
         email: emailSchema,
     })
 // .brand<"User">();
-export type User = z.infer<typeof userSchema>;
 
 export const fullUserSchema = z
     .object({
@@ -105,7 +103,13 @@ export const fullUserSchema = z
     })
     .and(userCredentialsSchema)
 // .brand<"FullUser">();
+
+export const patchUserSchema = userSchema.partial()
+
+export type UserCredentials = z.infer<typeof userCredentialsSchema>;
+export type User = z.infer<typeof userSchema>;
 export type FullUser = z.infer<typeof fullUserSchema>;
+export type PatchUser = z.infer<typeof patchUserSchema>;
 
 export const authTokenSchema = z.object({
     role: roleSchema,

@@ -37,8 +37,11 @@ const findUser = async (
 const createUser = async (cred: UserCredentials) => {
     const foundUser = await findUser(cred);
     if (foundUser != null) return null;
-    await sql`INSERT INTO users (email, password) VALUES (${cred.email}, ${cred.password});`;
-    return await findUser(cred);
+    return (
+        await sql<
+            User[]
+        >`INSERT INTO users (email, password) VALUES (${cred.email}, ${cred.password}) RETURNING id, email, role;`
+    )[0];
 };
 
 export const authMiddleware: Handler = async (req, res, next) => {
