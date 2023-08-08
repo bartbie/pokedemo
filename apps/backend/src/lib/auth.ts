@@ -6,26 +6,11 @@ import {
     authTokenSchema,
     userSchema,
 } from "@pokedemo/api";
-import { ok, err } from "@pokedemo/utils";
+import { ok, err, exclude } from "@pokedemo/utils";
 import { Handler } from "express";
 import { IncomingHttpHeaders } from "http";
 import jwt from "jsonwebtoken";
 import { sql } from "$lib/db";
-
-export const authMiddleware: Handler = async (req, res, next) => {
-    const token = await getToken(req.headers);
-    if (token == null) {
-        res.sendStatus(401);
-        return;
-    }
-    const user = await verifyToken(token);
-    if (user == null) {
-        res.sendStatus(403);
-        return;
-    }
-    req.context = { user };
-    next();
-};
 
 const getToken = async (headers: IncomingHttpHeaders) => {
     const authHeader = headers["authorization"];
@@ -48,18 +33,33 @@ const findUser = async (
     }
 };
 
-export const verifyToken = async (token: string) => {
-    const payload = jwt.verify(token, env.AUTH_SECRET);
-    const result = authTokenSchema.strict().safeParse(payload);
-    if (!result.success) return null;
-    return await findUser(result.data);
-};
-
 const createUser = async (cred: UserCredentials) => {
     const foundUser = await findUser(cred);
     if (foundUser != null) return null;
     await sql`INSERT INTO users (email, password) VALUES (${cred.email}, ${cred.password});`;
     return await findUser(cred);
+};
+
+export const authMiddleware: Handler = async (req, res, next) => {
+    const token = await getToken(req.headers);
+    if (token == null) {
+        res.sendStatus(401);
+        return;
+    }
+    const user = await verifyToken(token);
+    if (user == null) {
+        res.sendStatus(403);
+        return;
+    }
+    req.context = { user };
+    next();
+};
+
+export const verifyToken = async (token: string) => {
+    const payload = jwt.verify(token, env.AUTH_SECRET);
+    const result = authTokenSchema.strict().safeParse(payload);
+    if (!result.success) return null;
+    return await findUser(result.data);
 };
 
 export const login = async (cred: UserCredentials) => {
@@ -74,7 +74,7 @@ export const login = async (cred: UserCredentials) => {
     if (cred.password != foundUser.password) {
         return err("Wrong password" as const);
     }
-    return ok(userSchema.parse(foundUser)); // TODO: convert to use exclude func
+    return ok(exclude(foundUser, ["password"]));
 };
 
 export const signup = async (cred: UserCredentials) => {

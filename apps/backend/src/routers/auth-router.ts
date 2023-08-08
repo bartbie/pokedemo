@@ -4,6 +4,7 @@ import {
     type API,
     userCredentialsSchema,
     tokenRequestSchema,
+    Errors,
 } from "@pokedemo/api";
 import { makeEndpoint } from "$lib/endpoint";
 import { login, signup, verifyToken } from "$lib/auth";
@@ -23,13 +24,13 @@ export const authRouter = Router()
                             req.log.info(
                                 `login attempt failed: ${req.body.email} - Email doesn't exist`
                             );
-                            res.status(403).json(err("Email doesn't exist!"));
+                            res.status(403).json(err(Errors.emailNotExist));
                             return;
                         case "Wrong password":
                             req.log.info(
                                 `login attempt failed: ${req.body.email} - wrong password`
                             );
-                            res.status(403).json(err("Email doesn't exist!"));
+                            res.status(403).json(err(Errors.wrongPassword));
                             return;
                     }
                 }
@@ -47,7 +48,7 @@ export const authRouter = Router()
                 // TODO in future save sessions to DB
                 // for now we just return ok or err
                 if ((await verifyToken(req.body.token)) == null) {
-                    return res.status(200).json(err("Token is incorrect!"));
+                    return res.status(200).json(err(Errors.wrongToken));
                 }
                 res.status(200).send(ok());
             }
@@ -60,7 +61,7 @@ export const authRouter = Router()
             async (req, res) => {
                 const user = await signup(req.body);
                 if (user == null) {
-                    return res.status(400).json(err("Email already taken!"));
+                    return res.status(400).json(err(Errors.emailTaken));
                 }
                 return res.status(200).json(ok(user));
             }
@@ -73,7 +74,7 @@ export const authRouter = Router()
             async (req, res) => {
                 const user = await verifyToken(req.body.token);
                 if (user == null) {
-                    return res.status(200).json(err("Token is incorrect!"));
+                    return res.status(200).json(err(Errors.wrongToken));
                 }
                 res.status(200).send(ok(user));
             }
