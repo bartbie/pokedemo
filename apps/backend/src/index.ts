@@ -8,7 +8,7 @@ import { makeGetEndpoint } from "$lib/endpoint";
 import { setupDB } from "$lib/db/setup";
 import { logger, logMiddleware } from "$lib/log";
 import { pokemonRouter } from "./routers/pokemons-router";
-import { authRouter } from "routers/auth-router";
+import { authRouter } from "./routers/auth-router";
 
 const APIRouter = Router()
     .use("/pokemons", pokemonRouter)

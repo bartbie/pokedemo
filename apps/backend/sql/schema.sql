@@ -37,7 +37,8 @@ CREATE TABLE IF NOT EXISTS "pokemons" (
     "name" text UNIQUE NOT NULL,
     "weight" integer NOT NULL,
     "height" integer NOT NULL,
-    "sprite" text
+    "sprite" text,
+    "custom" boolean
 );
 --
 CREATE TABLE IF NOT EXISTS "users" (
