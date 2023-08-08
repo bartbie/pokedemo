@@ -37,6 +37,7 @@
     },
     "_moduleAliases": {
         "$lib": "dist/lib",
-        "$env": "dist/env"
+        "$env": "dist/env",
+        "~": "dist/"
     }
 }

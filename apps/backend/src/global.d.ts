@@ -1,4 +1,4 @@
-import { User } from "@pokedemo/api";
+import type { User } from "@pokedemo/api";
 
 export {};
 declare global {

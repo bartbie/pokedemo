@@ -1,5 +1,6 @@
 import { env } from "$env";
 import {
+    Errors,
     FullUser,
     User,
     UserCredentials,
@@ -43,12 +44,14 @@ const createUser = async (cred: UserCredentials) => {
 export const authMiddleware: Handler = async (req, res, next) => {
     const token = await getToken(req.headers);
     if (token == null) {
-        res.sendStatus(401);
+        req.log.info("Authentication failed: no token");
+        res.status(401).send(err(Errors.adminNeeded));
         return;
     }
     const user = await verifyToken(token);
     if (user == null) {
-        res.sendStatus(403);
+        req.log.info("Authentication failed: wrong token schema");
+        res.status(403).send(err(Errors.adminNeeded));
         return;
     }
     req.context = { user };

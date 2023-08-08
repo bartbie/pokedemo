@@ -30,39 +30,53 @@ export type PokemonType = z.infer<typeof pokemonTypeSchema>;
 export const roleSchema = z.enum(rolesArr);
 export type Role = z.infer<typeof roleSchema>;
 
-export const pokemonIdSchema = z.number().positive()/*.brand<"PokemonId">()*/;
+export const pokemonIdSchema = z.coerce.number().positive()/*.brand<"PokemonId">()*/;
 export type PokemonId = z.infer<typeof pokemonIdSchema>;
 
 // no need for now
 // export const pokeApiIdSchema = z.number().positive().brand<"PokeApiId">();
 // export type PokeApiId = z.infer<typeof pokeApiIdSchema>;
 
-export const pokemonSchema = z
-    .object({
-        id: pokemonIdSchema.optional(),
-        weight: z.number(),
-        height: z.number(),
-        type: z.tuple([pokemonTypeSchema, pokemonTypeSchema]),
-    })
+const pokemonBaseSchema = z.object({
+    id: pokemonIdSchema.optional(),
+    weight: z.number(),
+    height: z.number(),
+    type: z.tuple([pokemonTypeSchema, pokemonTypeSchema]),
+});
+
+const realPokemonBaseSchema = z.object({
+    pokeId: z.number().positive(),
+    sprite: z.string().url(),
+    custom: z.literal(false),
+})
+
+export const realPokemonSchema = pokemonBaseSchema.and(realPokemonBaseSchema);
+
+const customPokemonBaseSchema = z.object({
+    pokeId: z.null(),
+    sprite: z.null(),
+    custom: z.literal(true),
+})
+
+export const customPokemonSchema = pokemonBaseSchema.and(customPokemonBaseSchema);
+
+export const pokemonSchema = realPokemonSchema.or(customPokemonSchema);
+
+export const patchPokemonSchema = pokemonBaseSchema.partial()
     .and(
-        z
-            .object({
-                pokeId: z.number().positive(),
-                sprite: z.string().url(),
-                custom: z.literal(false),
-            })
+        realPokemonBaseSchema.partial()
             .or(
-                z.object({
-                    pokeId: z.null(),
-                    sprite: z.null(),
-                    custom: z.literal(true),
-                })
+                customPokemonBaseSchema.partial()
             )
-    );
+    )
 
 export type Pokemon = z.infer<typeof pokemonSchema>;
+export type CustomPokemon = z.infer<typeof customPokemonSchema>;
+export type RealPokemon = z.infer<typeof realPokemonSchema>;
+export type PatchPokemon = z.infer<typeof patchPokemonSchema>;
 
-export const userIdSchema = z.string().cuid2()/*.brand<"UserId">()*/;
+// export const userIdSchema = z.string().cuid2()/*.brand<"UserId">()*/;
+export const userIdSchema = z.coerce.number().positive()/*.brand<"UserId">()*/;
 export type UserId = z.infer<typeof userIdSchema>;
 
 export const emailSchema = z.string().email()/*.brand<"Email">()*/;

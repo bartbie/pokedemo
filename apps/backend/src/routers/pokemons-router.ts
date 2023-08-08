@@ -1,14 +1,16 @@
-import { Router, Request } from "express";
+import { Router } from "express";
 import { err, exclude, ok } from "@pokedemo/utils";
 import {
     pokemonSchema,
     type API,
     Pokemon,
-    pokemonIdSchema,
     Errors,
+    CustomPokemon,
+    patchPokemonSchema,
 } from "@pokedemo/api";
 import { makeEndpoint, makeGetEndpoint } from "$lib/endpoint";
 import { sql } from "$lib/db";
+import { IdParseMiddleware } from "~/middleware";
 
 const findPokemon = async (
     id: number
@@ -16,42 +18,52 @@ const findPokemon = async (
     return (
         await sql<
             Required<Pokemon>[]
-        >`SELECT * FROM pokemons WHERE id LIKE ${id} LIMIT 1`
+        >`SELECT * FROM pokemons WHERE id = ${id} LIMIT 1`
     ).at(0);
 };
 
 type PokeApi = Omit<API["/pokemons"], "/custom">; // remove custom so autocmp is less cluttered
+type PokeIdApi = PokeApi["/:id"];
+type CustomApi = API["/pokemons"]["/custom"];
+
+// TODO fix pokemonTypes insertion into db
 export const pokemonRouter = Router()
     .get(
         "/",
         makeGetEndpoint<PokeApi["GET"]>(async (req, res) => {
-            const query = `SELECT * FROM pokemons`;
-            req.log.info(query);
-            const result = await sql.unsafe<Required<Pokemon>[]>(query);
+            const params = `SELECT * FROM pokemons`;
+            req.log.info(params);
+            const result = await sql.unsafe<Required<Pokemon>[]>(params);
             res.status(200).json(ok(result));
         })
     )
     .post(
         "/",
         makeEndpoint<PokeApi["POST"]>(pokemonSchema, async (req, res) => {
-            const pokemon = req.body;
-            // TODO
+            const pokemon = exclude(req.body, ["id"]);
+            try {
+                await sql`INSERT INTO pokemons VALUES ${sql(pokemon)};`;
+                return res.status(200).json(ok());
+            } catch (e) {
+                req.log.error(e);
+                return res.status(200).json(err(Errors.wrongBody));
+            }
         })
-    );
-
-type PokeIdApi = PokeApi["/:id"];
-const pokemonIdRouter = Router()
-    .use((req, res, next) => {
-        const id = pokemonIdSchema.safeParse(req.query["id"]);
-        if (!id.success) {
-            return res.status(400).json(err(Errors.wrongId));
-        }
-        next();
-    })
+    )
+    .get(
+        "/custom",
+        makeGetEndpoint<CustomApi["GET"]>(async (req, res) => {
+            const customs = await sql<
+                Required<CustomPokemon>[]
+            >`SELECT * from pokemons where "pokeId" IS NULL`;
+            return res.status(200).json(ok(customs));
+        })
+    )
+    .use("/:id", IdParseMiddleware)
     .get(
         "/:id",
         makeGetEndpoint<PokeIdApi["GET"]>(async (req, res) => {
-            const id = req.query.id as any as number;
+            const id = req.params.id as number;
             const pokemon = await findPokemon(id);
             if (pokemon == undefined) {
                 return res.status(400).json(err(Errors.wrongId));
@@ -62,45 +74,36 @@ const pokemonIdRouter = Router()
     .delete(
         "/:id",
         makeEndpoint<PokeIdApi["DELETE"]>(null, async (req, res) => {
-            const id = req.query.id as any as number;
+            const id = req.params.id as number;
             const pokemon = await findPokemon(id);
             if (pokemon == undefined) {
                 return res.status(400).json(err(Errors.wrongId));
             }
             try {
                 await sql`DELETE FROM pokemons id LIKE ${id}`;
+                return res.status(200).json(ok());
             } catch (e) {
                 req.log.error(e);
+                return res.status(400).json(err(Errors.wrongId));
             }
-            res.status(200).json(ok());
         })
     )
     .patch(
         "/:id",
-        makeEndpoint<PokeIdApi["PATCH"]>(pokemonSchema, async (req, res) => {
-            const id = req.query.id as any as number;
-            const pokemon = exclude(req.body, ["id"]);
-            try {
-                await sql`UPDATE pokemons SET ${sql(pokemon)} WHERE id = ${id}`;
-            } catch (e) {
-                req.log.error(e);
+        makeEndpoint<PokeIdApi["PATCH"]>(
+            patchPokemonSchema,
+            async (req, res) => {
+                const id = req.params.id as number;
+                const pokemon = exclude(req.body, ["id"]);
+                try {
+                    await sql`UPDATE pokemons SET ${sql(
+                        pokemon
+                    )} WHERE id = ${id}`;
+                    return res.status(200).json(ok());
+                } catch (e) {
+                    req.log.error(e);
+                    return res.status(400).json(err(Errors.wrongId));
+                }
             }
-        })
+        )
     );
-
-type CustomApi = API["/pokemons"]["/custom"];
-const customRouter = Router().get(
-    "/",
-    makeGetEndpoint<CustomApi["GET"]>(async (req, res) => {
-        const pokemons = await sql<
-            Pokemon[]
-        >`SELECT * from pokemons where "pokeId" IS NULL`;
-    })
-);
-
-pokemonRouter.use(pokemonIdRouter);
-pokemonRouter.use(customRouter);
-/*
-    `SELECT pokemons.*, favorite LEFT FROM users_pokemons LEFT JOIN pokemons ON
- pokemons.id = users_pokemons.pokemon_id WHERE users_pokemons.user_id = 1`;
- */

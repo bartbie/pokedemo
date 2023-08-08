@@ -68,7 +68,7 @@ export type API = {
                 response: Result<Required<t.Pokemon>, Err["wrongId"]>;
             }>;
             PATCH: _Endpoint<{
-                request: t.Pokemon;
+                request: t.PatchPokemon;
                 response: Required<
                     Result<void, Err["wrongId" | "wrongBody" | "adminNeeded"]>
                 >;
@@ -79,7 +79,7 @@ export type API = {
         };
         "/custom": {
             GET: _GETEndpoint<{
-                response: Result<Required<t.Pokemon>[], never>;
+                response: Result<Required<t.CustomPokemon>[], never>;
             }>;
             // POST: _Endpoint<{
             //     request: t.Pokemon;
