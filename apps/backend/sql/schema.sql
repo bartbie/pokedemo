@@ -1,28 +1,28 @@
--- custom types
-DO $$ BEGIN CREATE TYPE "pokemon_types" AS ENUM(
-    'NORMAL',
-    'FIGHTING',
-    'FLYING',
-    'POISON',
-    'GROUND',
-    'ROCK',
-    'BUG',
-    'GHOST',
-    'STEEL',
-    'FIRE',
-    'WATER',
-    'GRASS',
-    'ELECTRIC',
-    'PSYCHIC',
-    'ICE',
-    'DRAGON',
-    'DARK',
-    'FAIRY',
-    'UNKNOWN',
-    'SHADOW'
-);
-EXCEPTION
-WHEN duplicate_object THEN null;
+DO $$ BEGIN
+    CREATE TYPE "pokemon_types" AS ENUM(
+        'NORMAL',
+        'FIGHTING',
+        'FLYING',
+        'POISON',
+        'GROUND',
+        'ROCK',
+        'BUG',
+        'GHOST',
+        'STEEL',
+        'FIRE',
+        'WATER',
+        'GRASS',
+        'ELECTRIC',
+        'PSYCHIC',
+        'ICE',
+        'DRAGON',
+        'DARK',
+        'FAIRY',
+        'UNKNOWN',
+        'SHADOW'
+    );
+    EXCEPTION
+        WHEN duplicate_object THEN null;
 END $$;
 --
 DO $$ BEGIN CREATE TYPE "roles" AS ENUM('USER', 'ADMIN');
@@ -51,5 +51,6 @@ CREATE TABLE IF NOT EXISTS "users" (
 CREATE TABLE IF NOT EXISTS "users_pokemons" (
 "user_id" integer REFERENCES users(id),
 "pokemon_id" integer REFERENCES pokemons(id),
-"favorite" boolean DEFAULT false NOT NULL
+"favorite" boolean DEFAULT false NOT NULL,
+CONSTRAINT pk_user_pokemon PRIMARY KEY (user_id, pokemon_id)
 );

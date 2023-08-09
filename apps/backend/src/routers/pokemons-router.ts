@@ -3,7 +3,6 @@ import { err, exclude, ok } from "@pokedemo/utils";
 import {
     pokemonSchema,
     type API,
-    Pokemon,
     Errors,
     CustomPokemon,
     patchPokemonSchema,
@@ -11,14 +10,13 @@ import {
 } from "@pokedemo/api";
 import { makeEndpoint, makeGetEndpoint } from "$lib/utils/endpoint";
 import { sql } from "$lib/db";
-import { pokemonIdMiddleware } from "~/middleware";
-import { findPokemon, fixArrayEnum } from "$lib/pokemons";
+import { authMiddleware, pokemonIdMiddleware } from "~/middleware";
+import { fixArrayEnum } from "$lib/pokemons";
 
 type PokeApi = Omit<API["/pokemons"], "/custom">; // remove custom so autocmp is less cluttered
 type PokeIdApi = PokeApi["/:id"];
 type CustomApi = API["/pokemons"]["/custom"];
 
-// TODO add authMiddleware
 export const pokemonRouter = Router()
     .get(
         "/",
@@ -31,6 +29,7 @@ export const pokemonRouter = Router()
     )
     .post(
         "/",
+        authMiddleware,
         makeEndpoint<PokeApi["POST"]>(pokemonSchema, async (req, res) => {
             const pokemon = exclude(req.body, ["id"]);
             try {
@@ -68,6 +67,7 @@ export const pokemonRouter = Router()
     )
     .delete(
         "/:id",
+        authMiddleware,
         makeEndpoint<PokeIdApi["DELETE"]>(null, async (req, res) => {
             const id = req.params.id as number;
             const pokemon = req.context?.id?.pokemon as ExistingPokemon;
@@ -82,6 +82,7 @@ export const pokemonRouter = Router()
     )
     .patch(
         "/:id",
+        authMiddleware,
         makeEndpoint<PokeIdApi["PATCH"]>(
             patchPokemonSchema,
             async (req, res) => {

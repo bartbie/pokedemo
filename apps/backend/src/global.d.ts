@@ -1,4 +1,4 @@
-import type { ExistingPokemon, User } from "@pokedemo/api";
+import type { ExistingPokemon, User, UserPokemon } from "@pokedemo/api";
 
 export {};
 declare global {
@@ -14,6 +14,7 @@ declare global {
         id?: {
             pokemon?: ExistingPokemon;
             user?: User;
+            userPokemon?: UserPokemon;
         };
     };
 }

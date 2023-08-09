@@ -1,22 +1,20 @@
 import { sql } from "$lib/db";
-import { findUser } from "$lib/users";
 import { makeEndpoint, makeGetEndpoint } from "$lib/utils/endpoint";
 import {
     patchUserSchema,
     type API,
-    userSchema,
     User,
     Errors,
 } from "@pokedemo/api";
 import { err, exclude, ok } from "@pokedemo/utils";
 import { Router } from "express";
-import { userIdMiddleware } from "~/middleware";
+import { authMiddleware, myPokemonsIdMiddleware } from "~/middleware";
 
 type RouterApi = Omit<API["/users"], "/:id">;
 type RouterIdApi = API["/users"]["/:id"];
 
-// TODO add authMiddleware
-export const authRouter = Router()
+export const usersRouter = Router()
+    .use(authMiddleware)
     .get(
         "/",
         makeGetEndpoint<RouterApi["GET"]>(async (req, res) => {
@@ -24,7 +22,7 @@ export const authRouter = Router()
             return res.status(200).json(ok(users));
         })
     )
-    .use("/:id", userIdMiddleware)
+    .use("/:id", myPokemonsIdMiddleware)
     .get(
         "/:id",
         makeGetEndpoint<RouterIdApi["GET"]>(async (req, res) => {

@@ -9,10 +9,14 @@ import { setupDB } from "$lib/db/setup";
 import { logger, logMiddleware } from "$lib/utils/log";
 import { pokemonRouter } from "./routers/pokemons-router";
 import { authRouter } from "./routers/auth-router";
+import { usersRouter } from "./routers/users-router";
+import { myPokemonsRouter } from "./routers/me/my-pokemons-router";
 
 const APIRouter = Router()
     .use("/pokemons", pokemonRouter)
     .use("/auth", authRouter)
+    .use("/users", usersRouter)
+    .use("/me/pokemons", myPokemonsRouter)
     .get(
         "/healthcheck",
         makeGetEndpoint<API["/healthcheck"]["GET"]>((_, res) => {

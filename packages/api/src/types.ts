@@ -71,12 +71,7 @@ export const patchPokemonSchema = pokemonBaseSchema.partial()
     )
 
 export const existingPokemonSchema = pokemonBaseSchema.required()
-    .and(
-        realPokemonBaseSchema.partial()
-            .or(
-                customPokemonBaseSchema.partial()
-            )
-    )
+    .and(realPokemonBaseSchema.or(customPokemonBaseSchema))
 
 export type Pokemon = z.infer<typeof pokemonSchema>;
 export type CustomPokemon = z.infer<typeof customPokemonSchema>;
@@ -121,10 +116,19 @@ export type User = z.infer<typeof userSchema>;
 export type FullUser = z.infer<typeof fullUserSchema>;
 export type PatchUser = z.infer<typeof patchUserSchema>;
 
-export const UserPokemon = z.object({
+export const userPokemonSchema = z.object({
     favorite: z.boolean(),
     pokemon: existingPokemonSchema,
 })
+
+
+export const userPokemonIdSchema = z.object({
+    favorite: z.boolean(),
+    id: pokemonIdSchema,
+})
+
+export type UserPokemon = z.infer<typeof userPokemonSchema>;
+export type UserPokemonId = z.infer<typeof userPokemonIdSchema>;
 
 export const authTokenSchema = z.object({
     role: roleSchema,

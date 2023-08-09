@@ -156,17 +156,17 @@ export type API = {
     "/me": {
         "/pokemons": {
             GET: _GETEndpoint<{
-                response: Result<t.ExistingPokemon[], never>;
+                response: Result<t.UserPokemon[], never>;
             }>;
             /** adds new *existing* pokemons to user's collection */
             PUT: _Endpoint<{
                 request: {
-                    pokemons: { id: t.PokemonId; favorite: boolean }[]
+                    pokemons: t.UserPokemonId[]
                 };
                 response: Result<
                     void,
                     | { message: Err["wrongBody"] }
-                    | { message: Err["wrongId"]; data: t.PokemonId[] }
+                    | { message: Err["wrongId"] }
                 >;
             }>;
             /** deletes pokemon from user's collection */
@@ -175,21 +175,12 @@ export type API = {
                 response: Result<
                     void,
                     | { message: Err["wrongBody"] }
-                    | { message: Err["wrongId"]; data: t.PokemonId[] }
+                    | { message: Err["wrongId"] }
                 >;
             }>;
             "/favorites": {
                 GET: _GETEndpoint<{
                     response: Result<t.ExistingPokemon[], never>;
-                }>;
-                /** deletes pokemons from user's favorites */
-                DELETE: _Endpoint<{
-                    request: { id: t.PokemonId[] };
-                    response: Result<
-                        void,
-                        | { message: Err["wrongBody"] }
-                        | { message: Err["wrongId"]; data: t.PokemonId[] }
-                    >;
                 }>;
                 /** adds each pokemon to favorites */
                 PUT: _Endpoint<{
@@ -197,7 +188,16 @@ export type API = {
                     response: Result<
                         void,
                         | { message: Err["wrongBody"] }
-                        | { message: Err["wrongId"]; data: t.PokemonId[] }
+                        | { message: Err["wrongId"] }
+                    >;
+                }>;
+                /** deletes pokemons from user's favorites */
+                DELETE: _Endpoint<{
+                    request: { id: t.PokemonId[] };
+                    response: Result<
+                        void,
+                        | { message: Err["wrongBody"] }
+                        | { message: Err["wrongId"] }
                     >;
                 }>;
                 /** manipulate 'favoriteness' of specific pokemon */
