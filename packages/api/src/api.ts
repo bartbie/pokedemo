@@ -57,20 +57,20 @@ export type API = {
     }
     "/pokemons": {
         GET: _GETEndpoint<{
-            response: Result<Required<t.Pokemon>[], never>;
+            response: Result<t.ExistingPokemon[], never>;
         }>;
         POST: _Endpoint<{
             request: t.Pokemon;
-            response: Result<Required<t.Pokemon>, Err["wrongBody" | "adminNeeded"]>;
+            response: Result<t.ExistingPokemon, Err["wrongBody" | "adminNeeded"]>;
         }>;
         "/:id": {
             GET: _GETEndpoint<{
-                response: Result<Required<t.Pokemon>, Err["wrongId"]>;
+                response: Result<t.ExistingPokemon, Err["wrongId"]>;
             }>;
             PATCH: _Endpoint<{
                 request: t.PatchPokemon;
                 response:
-                Result<Required<t.Pokemon>, Err["wrongId" | "wrongBody" | "adminNeeded"]>;
+                Result<t.ExistingPokemon, Err["wrongId" | "wrongBody" | "adminNeeded"]>;
             }>;
             DELETE: _ResOnlyEndpoint<{
                 response: Result<void, Err["wrongId" | "adminNeeded"]>;
@@ -105,7 +105,7 @@ export type API = {
     };
     "/users": {
         GET: _GETEndpoint<{
-            response: Result<Required<t.User>[], Err["adminNeeded"]>
+            response: Result<t.User[], Err["adminNeeded"]>
         }>,
         // POST: _Endpoint<{
         //     request: t.User,
@@ -113,11 +113,11 @@ export type API = {
         // }>,
         "/:id": {
             GET: _GETEndpoint<{
-                response: Result<Required<t.User>, Err["wrongId" | "adminNeeded"]>
+                response: Result<t.User, Err["wrongId" | "adminNeeded"]>
             }>,
             PATCH: _Endpoint<{
                 request: t.PatchUser;
-                response: Result<Required<t.User>, Err["wrongBody" | "wrongId" | "adminNeeded"]>
+                response: Result<t.User, Err["wrongBody" | "wrongId" | "adminNeeded"]>
             }>,
             DELETE: _ResOnlyEndpoint<{
                 response: Result<void, Err["wrongBody" | "wrongId" | "adminNeeded"]>
@@ -128,14 +128,14 @@ export type API = {
         "/signup": {
             POST: _Endpoint<{
                 request: t.UserCredentials;
-                response: Result<Required<t.User>, Err["wrongBody" | "emailTaken"]>;
+                response: Result<t.User, Err["wrongBody" | "emailTaken"]>;
             }>;
         };
         "/login": {
             POST: _Endpoint<{
                 request: t.UserCredentials;
                 response: Result<
-                    Required<t.User>,
+                    t.User,
                     Err["wrongBody" | "emailNotExist" | "wrongPassword"]
                 >;
             }>;
@@ -156,11 +156,13 @@ export type API = {
     "/me": {
         "/pokemons": {
             GET: _GETEndpoint<{
-                response: Result<Required<t.Pokemon>[], never>;
+                response: Result<t.ExistingPokemon[], never>;
             }>;
             /** adds new *existing* pokemons to user's collection */
             PUT: _Endpoint<{
-                request: { pokemons: { id: t.PokemonId[]; favorite: boolean } };
+                request: {
+                    pokemons: { id: t.PokemonId; favorite: boolean }[]
+                };
                 response: Result<
                     void,
                     | { message: Err["wrongBody"] }
@@ -178,7 +180,7 @@ export type API = {
             }>;
             "/favorites": {
                 GET: _GETEndpoint<{
-                    response: Result<Required<t.Pokemon>[], never>;
+                    response: Result<t.ExistingPokemon[], never>;
                 }>;
                 /** deletes pokemons from user's favorites */
                 DELETE: _Endpoint<{

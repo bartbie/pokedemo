@@ -29,7 +29,7 @@ export const authRouter = Router()
         "/:id",
         makeGetEndpoint<RouterIdApi["GET"]>(async (req, res) => {
             // const id = req.params.id as number;
-            const user = req.context?.id?.user as Required<User>;
+            const user = req.context?.id?.user as User;
             return res.status(200).json(ok(user));
         })
     )
@@ -37,7 +37,7 @@ export const authRouter = Router()
         "/:id",
         makeEndpoint<RouterIdApi["DELETE"]>(null, async (req, res) => {
             const id = req.params.id as number;
-            // const user = req.context?.id?.user as Required<User>;
+            // const user = req.context?.id?.user as User;
             await sql`DELETE FROM users WHERE id = ${id}`;
             return res.status(200).json(ok());
         })
@@ -48,7 +48,7 @@ export const authRouter = Router()
             patchUserSchema,
             async (req, res) => {
                 const id = req.params.id as number;
-                // const user = req.context?.id?.user as Required<User>;
+                // const user = req.context?.id?.user as User;
                 const newUser = exclude(req.body, ["id"]);
                 try {
                     const updatedUser = (

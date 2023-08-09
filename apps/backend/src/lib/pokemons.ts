@@ -10,3 +10,10 @@ export const findPokemon = async (
         >`SELECT * FROM pokemons WHERE id = ${id} LIMIT 1`
     ).at(0);
 };
+
+export const fixArrayEnum = (pokemon: { type?: Pokemon["type"] }) => {
+    if ("type" in pokemon) {
+        pokemon.type = `{${pokemon.type}}` as any;
+    }
+    return pokemon;
+};
