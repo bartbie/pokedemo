@@ -8,25 +8,17 @@ import {
     CustomPokemon,
     patchPokemonSchema,
 } from "@pokedemo/api";
-import { makeEndpoint, makeGetEndpoint } from "$lib/endpoint";
+import { makeEndpoint, makeGetEndpoint } from "$lib/utils/endpoint";
 import { sql } from "$lib/db";
-import { IdParseMiddleware } from "~/middleware";
-
-const findPokemon = async (
-    id: number
-): Promise<Required<Pokemon> | undefined> => {
-    return (
-        await sql<
-            Required<Pokemon>[]
-        >`SELECT * FROM pokemons WHERE id = ${id} LIMIT 1`
-    ).at(0);
-};
+import { pokemonIdMiddleware } from "~/middleware";
+import { findPokemon } from "$lib/pokemons";
 
 type PokeApi = Omit<API["/pokemons"], "/custom">; // remove custom so autocmp is less cluttered
 type PokeIdApi = PokeApi["/:id"];
 type CustomApi = API["/pokemons"]["/custom"];
 
 // TODO fix pokemonTypes insertion into db
+// TODO add authMiddleware
 export const pokemonRouter = Router()
     .get(
         "/",
@@ -63,15 +55,12 @@ export const pokemonRouter = Router()
             return res.status(200).json(ok(customs));
         })
     )
-    .use("/:id", IdParseMiddleware)
+    .use("/:id", pokemonIdMiddleware)
     .get(
         "/:id",
         makeGetEndpoint<PokeIdApi["GET"]>(async (req, res) => {
             const id = req.params.id as number;
-            const pokemon = await findPokemon(id);
-            if (pokemon == undefined) {
-                return res.status(400).json(err(Errors.wrongId));
-            }
+            const pokemon = req.context?.id?.pokemon as Required<Pokemon>;
             res.status(200).json(ok(pokemon));
         })
     )
@@ -79,10 +68,7 @@ export const pokemonRouter = Router()
         "/:id",
         makeEndpoint<PokeIdApi["DELETE"]>(null, async (req, res) => {
             const id = req.params.id as number;
-            const pokemon = await findPokemon(id);
-            if (pokemon == undefined) {
-                return res.status(400).json(err(Errors.wrongId));
-            }
+            const pokemon = req.context?.id?.pokemon as Required<Pokemon>;
             try {
                 await sql`DELETE FROM pokemons id LIKE ${id}`;
                 return res.status(200).json(ok());
@@ -98,13 +84,15 @@ export const pokemonRouter = Router()
             patchPokemonSchema,
             async (req, res) => {
                 const id = req.params.id as number;
-                const pokemon = exclude(req.body, ["id"]);
+                const _pokemon = req.context?.id?.pokemon as Required<Pokemon>;
+
+                const newPokemon = exclude(req.body, ["id"]);
                 try {
                     const updatedPokemon = (
                         await sql<
                             Required<Pokemon>[]
                         >`UPDATE pokemons SET ${sql(
-                            pokemon
+                            newPokemon
                         )} WHERE id = ${id} RETURNING *;`
                     )[0];
                     return res.status(200).json(ok(updatedPokemon));

@@ -107,10 +107,10 @@ export type API = {
         GET: _GETEndpoint<{
             response: Result<Required<t.User>[], Err["adminNeeded"]>
         }>,
-        POST: _Endpoint<{
-            request: t.User,
-            response: Result<Required<t.User>, Err["wrongBody" | "wrongId" | "adminNeeded"]>
-        }>,
+        // POST: _Endpoint<{
+        //     request: t.User,
+        //     response: Result<Required<t.User>, Err["wrongBody" | "wrongId" | "adminNeeded"]>
+        // }>,
         "/:id": {
             GET: _GETEndpoint<{
                 response: Result<Required<t.User>, Err["wrongId" | "adminNeeded"]>

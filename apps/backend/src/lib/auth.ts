@@ -57,7 +57,7 @@ export const authMiddleware: Handler = async (req, res, next) => {
         res.status(403).send(err(Errors.adminNeeded));
         return;
     }
-    req.context = { user };
+    req.context = { auth: { user } };
     next();
 };
 

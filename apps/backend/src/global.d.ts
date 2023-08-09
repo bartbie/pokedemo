@@ -1,4 +1,4 @@
-import type { User } from "@pokedemo/api";
+import type { Pokemon, User } from "@pokedemo/api";
 
 export {};
 declare global {
@@ -8,6 +8,12 @@ declare global {
         }
     }
     type Context = {
-        user: User;
+        auth?: {
+            user: User;
+        };
+        id?: {
+            pokemon?: Required<Pokemon>;
+            user?: Required<User>;
+        };
     };
 }

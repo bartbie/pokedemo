@@ -4,9 +4,9 @@ import { default as express, json, Router } from "express";
 import { API, HealthCheckMsg } from "@pokedemo/api";
 import { ok } from "@pokedemo/utils";
 import { env } from "$env";
-import { makeGetEndpoint } from "$lib/endpoint";
+import { makeGetEndpoint } from "$lib/utils/endpoint";
 import { setupDB } from "$lib/db/setup";
-import { logger, logMiddleware } from "$lib/log";
+import { logger, logMiddleware } from "$lib/utils/log";
 import { pokemonRouter } from "./routers/pokemons-router";
 import { authRouter } from "./routers/auth-router";
 

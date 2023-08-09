@@ -6,7 +6,7 @@ import {
     tokenRequestSchema,
     Errors,
 } from "@pokedemo/api";
-import { makeEndpoint } from "$lib/endpoint";
+import { makeEndpoint } from "$lib/utils/endpoint";
 import { login, signup, verifyToken } from "$lib/auth";
 
 type RouterApi = API["/auth"];
