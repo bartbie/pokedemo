@@ -4,11 +4,11 @@ import { defineConfig } from "vite";
 export default defineConfig({
     plugins: [sveltekit()]
     // optimizeDeps: {
-    //     include: ["@pokedemo/api", "@pokedemo/utils"],
+    //     include: ["@pokedemo/api", "@pokedemo/utils"]
     // },
     // build: {
     //     commonjsOptions: {
-    //         include: [/api/, /utils/, /node_modules/],
-    //     },
-    // },
+    //         include: [/api/, /utils/, /node_modules/]
+    //     }
+    // }
 });

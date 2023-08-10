@@ -68,6 +68,13 @@ importers:
         version: 10.9.1(@types/node@20.4.6)(typescript@5.1.6)
 
   apps/frontend:
+    dependencies:
+      '@pokedemo/api':
+        specifier: workspace:*
+        version: link:../../packages/api
+      '@pokedemo/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
     devDependencies:
       '@floating-ui/dom':
         specifier: ^1.5.1

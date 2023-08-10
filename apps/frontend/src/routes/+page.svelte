@@ -1,4 +1,16 @@
 <!-- YOU CAN DELETE EVERYTHING IN THIS PAGE -->
+<script lang="ts">
+    import { apiClient } from "$lib/api";
+    import type { API } from "@pokedemo/api";
+    import { onMount } from "svelte";
+
+    const api = apiClient(fetch);
+
+    onMount(async () => {
+        let checkIfWrapperWorks = await api<API["/healthcheck"]["GET"]>("/api/healthcheck");
+        console.log(checkIfWrapperWorks);
+    });
+</script>
 
 <div class="container h-full mx-auto flex justify-center items-center">
     <div class="space-y-10 text-center flex flex-col items-center">
