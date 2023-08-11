@@ -26,7 +26,7 @@ export const makeEndpoint: MakeEndpoint = (bodySchema: any, fn: any) => {
         if (bodySchema != null) {
             const result = bodySchema.safeParse(req.body);
             if (!result.success) {
-                return res.send(400).send(err(Errors.wrongBody));
+                return res.status(400).json(err(Errors.wrongBody));
             }
         }
         return fn(req, res);

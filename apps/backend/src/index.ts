@@ -1,8 +1,8 @@
 import "module-alias/register"; // set up path aliases
 //
-import { default as express, json, Router } from "express";
+import { default as express, Handler, json, Router } from "express";
 import { API, HealthCheckMsg } from "@pokedemo/api";
-import { ok } from "@pokedemo/utils";
+import { err, ok } from "@pokedemo/utils";
 import { env } from "$env";
 import { makeGetEndpoint } from "$lib/utils/endpoint";
 import { setupDB } from "$lib/db/setup";
@@ -22,7 +22,8 @@ const APIRouter = Router()
         makeGetEndpoint<API["/healthcheck"]["GET"]>((_, res) => {
             res.status(200).json(ok(HealthCheckMsg));
         })
-    );
+    )
+    .use((_, res) => res.status(404).json(err("Unknown route!")));
 
 const server = () => {
     const PORT = env.PORT;
@@ -31,6 +32,7 @@ const server = () => {
         .use(logMiddleware)
         .get("/", (_, res) => res.send("Pokedemo server."))
         .use("/api", APIRouter)
+        .use((_, res) => res.sendStatus(404))
         .listen(PORT, () => {
             logger.info(
                 `⚡️[server]: Server is running at http://localhost:${PORT}`

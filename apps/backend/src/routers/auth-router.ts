@@ -50,7 +50,7 @@ export const authRouter = Router()
                 if ((await verifyToken(req.body.token)) == null) {
                     return res.status(200).json(err(Errors.wrongToken));
                 }
-                res.status(200).send(ok());
+                res.status(200).json(ok());
             }
         )
     )
@@ -76,7 +76,7 @@ export const authRouter = Router()
                 if (user == null) {
                     return res.status(200).json(err(Errors.wrongToken));
                 }
-                res.status(200).send(ok(user));
+                res.status(200).json(ok(user));
             }
         )
     );
