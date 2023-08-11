@@ -12,11 +12,11 @@ DECLARE
     DELETE FROM pokemons;
     ---
     INSERT INTO users (email, password)
-    VALUES ('test', 'test')
+    VALUES ('test@test.com', 'test')
     RETURNING id INTO user_id_1;
     --
     INSERT INTO users (email, password, role)
-    VALUES ('admin', 'admin', 'ADMIN')
+    VALUES ('admin@admin.com', 'admin', 'ADMIN')
     RETURNING id INTO user_id_2;
     ---
     INSERT INTO pokemons ("pokeId", name, "height", weight, sprite, custom)
