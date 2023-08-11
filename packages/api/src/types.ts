@@ -30,7 +30,9 @@ export type PokemonType = z.infer<typeof pokemonTypeSchema>;
 export const roleSchema = z.enum(rolesArr);
 export type Role = z.infer<typeof roleSchema>;
 
-export const pokemonIdSchema = z.coerce.number().positive()/*.brand<"PokemonId">()*/;
+export const pokemonIdSchema = z.coerce
+    .number()
+    .positive(); /*.brand<"PokemonId">()*/
 export type PokemonId = z.infer<typeof pokemonIdSchema>;
 
 // no need for now
@@ -48,7 +50,7 @@ const realPokemonBaseSchema = z.object({
     pokeId: z.number().positive(),
     sprite: z.string().url(),
     custom: z.literal(false),
-})
+});
 
 export const realPokemonSchema = pokemonBaseSchema.and(realPokemonBaseSchema);
 
@@ -56,22 +58,21 @@ const customPokemonBaseSchema = z.object({
     pokeId: z.null(),
     sprite: z.null(),
     custom: z.literal(true),
-})
+});
 
-export const customPokemonSchema = pokemonBaseSchema.and(customPokemonBaseSchema);
+export const customPokemonSchema = pokemonBaseSchema.and(
+    customPokemonBaseSchema
+);
 
 export const pokemonSchema = realPokemonSchema.or(customPokemonSchema);
 
-export const patchPokemonSchema = pokemonBaseSchema.partial()
-    .and(
-        realPokemonBaseSchema.partial()
-            .or(
-                customPokemonBaseSchema.partial()
-            )
-    )
+export const patchPokemonSchema = pokemonBaseSchema
+    .partial()
+    .and(realPokemonBaseSchema.partial().or(customPokemonBaseSchema.partial()));
 
-export const existingPokemonSchema = pokemonBaseSchema.required()
-    .and(realPokemonBaseSchema.or(customPokemonBaseSchema))
+export const existingPokemonSchema = pokemonBaseSchema
+    .required()
+    .and(realPokemonBaseSchema.or(customPokemonBaseSchema));
 
 export type Pokemon = z.infer<typeof pokemonSchema>;
 export type CustomPokemon = z.infer<typeof customPokemonSchema>;
@@ -79,12 +80,11 @@ export type RealPokemon = z.infer<typeof realPokemonSchema>;
 export type PatchPokemon = z.infer<typeof patchPokemonSchema>;
 export type ExistingPokemon = z.infer<typeof existingPokemonSchema>;
 
-
 // export const userIdSchema = z.string().cuid2()/*.brand<"UserId">()*/;
-export const userIdSchema = z.coerce.number().positive()/*.brand<"UserId">()*/;
+export const userIdSchema = z.coerce.number().positive(); /*.brand<"UserId">()*/
 export type UserId = z.infer<typeof userIdSchema>;
 
-export const emailSchema = z.string().email()/*.brand<"Email">()*/;
+export const emailSchema = z.string().email(); /*.brand<"Email">()*/
 export type Email = z.infer<typeof emailSchema>;
 
 export const userCredentialsSchema = z.object({
@@ -93,12 +93,11 @@ export const userCredentialsSchema = z.object({
 });
 
 // branded so these two + credentials won't get mixed up by mistake
-export const userSchema = z
-    .object({
-        id: userIdSchema,
-        role: roleSchema,
-        email: emailSchema,
-    })
+export const userSchema = z.object({
+    id: userIdSchema,
+    role: roleSchema,
+    email: emailSchema,
+});
 // .brand<"User">();
 
 export const fullUserSchema = z
@@ -106,10 +105,10 @@ export const fullUserSchema = z
         id: userIdSchema,
         role: roleSchema,
     })
-    .and(userCredentialsSchema)
+    .and(userCredentialsSchema);
 // .brand<"FullUser">();
 
-export const patchUserSchema = userSchema.partial()
+export const patchUserSchema = userSchema.partial();
 
 export type UserCredentials = z.infer<typeof userCredentialsSchema>;
 export type User = z.infer<typeof userSchema>;
@@ -119,13 +118,12 @@ export type PatchUser = z.infer<typeof patchUserSchema>;
 export const userPokemonSchema = z.object({
     favorite: z.boolean(),
     pokemon: existingPokemonSchema,
-})
-
+});
 
 export const userPokemonIdSchema = z.object({
     favorite: z.boolean(),
     id: pokemonIdSchema,
-})
+});
 
 export type UserPokemon = z.infer<typeof userPokemonSchema>;
 export type UserPokemonId = z.infer<typeof userPokemonIdSchema>;
@@ -137,7 +135,14 @@ export const authTokenSchema = z.object({
 export type AuthToken = z.infer<typeof authTokenSchema>;
 
 export const tokenRequestSchema = z.object({
-    token: z.string()
-})
+    token: z.string(),
+});
 
 export type TokenRequest = z.infer<typeof tokenRequestSchema>;
+
+export const tokenResponseSchema = z.object({
+    user: userSchema,
+    token: z.string(),
+});
+
+export type TokenResponse = z.infer<typeof tokenResponseSchema>;

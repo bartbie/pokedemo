@@ -6,6 +6,8 @@ import {
     UserCredentials,
     authTokenSchema,
     userSchema,
+    tokenResponseSchema,
+    AuthToken,
 } from "@pokedemo/api";
 import { ok, err, exclude } from "@pokedemo/utils";
 import { Handler } from "express";
@@ -13,10 +15,26 @@ import { IncomingHttpHeaders } from "http";
 import jwt from "jsonwebtoken";
 import { sql } from "$lib/db";
 
+// Token
+
 const getToken = async (headers: IncomingHttpHeaders) => {
-    const authHeader = headers["authorization"];
+    const authHeader = headers.authorization;
     return authHeader && authHeader.split(" ")[1];
 };
+
+const createToken = (usr: AuthToken) => {
+    // just for safety strip usr of any garbage
+    return jwt.sign(authTokenSchema.strip().parse(usr), env.AUTH_SECRET);
+};
+
+export const verifyToken = async (token: string) => {
+    const payload = jwt.verify(token, env.AUTH_SECRET);
+    const result = authTokenSchema.strict().safeParse(payload);
+    if (!result.success) return null;
+    return await findUser(result.data);
+};
+
+// DB
 
 const findUser = async (
     user: Pick<User, "email"> & Partial<Pick<User, "role">>
@@ -25,12 +43,12 @@ const findUser = async (
         const foundUser = await sql<
             User[]
         >`SELECT id, email, role, FROM users WHERE email LIKE ${user.email} AND role LIKE ${user.role} LIMIT 1`;
-        return foundUser[0] || null;
+        return foundUser.at(0) || null;
     } else {
         const foundUser = await sql<
             User[]
         >`SELECT id, email, role, FROM users WHERE email LIKE ${user.email} LIMIT 1`;
-        return foundUser[0] || null;
+        return foundUser.at(0) || null;
     }
 };
 
@@ -43,6 +61,8 @@ const createUser = async (cred: UserCredentials) => {
         >`INSERT INTO users (email, password) VALUES (${cred.email}, ${cred.password}) RETURNING id, email, role;`
     )[0];
 };
+
+// exported utils
 
 export const authMiddleware: Handler = async (req, res, next) => {
     const token = await getToken(req.headers);
@@ -61,13 +81,6 @@ export const authMiddleware: Handler = async (req, res, next) => {
     next();
 };
 
-export const verifyToken = async (token: string) => {
-    const payload = jwt.verify(token, env.AUTH_SECRET);
-    const result = authTokenSchema.strict().safeParse(payload);
-    if (!result.success) return null;
-    return await findUser(result.data);
-};
-
 export const login = async (cred: UserCredentials) => {
     const foundUser = (
         await sql<
@@ -80,9 +93,16 @@ export const login = async (cred: UserCredentials) => {
     if (cred.password != foundUser.password) {
         return err("Wrong password" as const);
     }
-    return ok(exclude(foundUser, ["password"]));
+    const user = exclude(foundUser, ["password"]);
+    const token = createToken(user);
+    return ok({ user, token });
 };
 
 export const signup = async (cred: UserCredentials) => {
-    return await createUser(cred);
+    const user = await createUser(cred);
+    if (user != null) {
+        const token = createToken(user);
+        return { user, token };
+    }
+    return null;
 };

@@ -20,48 +20,54 @@ export type Endpoint<B extends Record<string, any>, R extends Result> = {
     readonly request: B;
     readonly response: R;
     __type: "Endpoint";
-}
+};
 
 export type ResOnlyEndpoint<R extends Result> = {
     readonly response: R;
     __type: "ResOnlyEndpoint";
-}
+};
 
 // --- helper types
 
 type EndpointType<B extends Record<string, any>, R extends Result> = {
     readonly request: B;
     readonly response: R;
-}
+};
 
 type ResponseOnlyEndpointType<R extends Result> = {
     readonly response: R;
-}
+};
 
-type _Endpoint<schema extends EndpointType<any, any>> = Endpoint<schema["request"], schema["response"]>
+type _Endpoint<schema extends EndpointType<any, any>> = Endpoint<
+    schema["request"],
+    schema["response"]
+>;
 
-type _ResOnlyEndpoint<schema extends ResponseOnlyEndpointType<any>> = ResOnlyEndpoint<schema["response"]>
+type _ResOnlyEndpoint<schema extends ResponseOnlyEndpointType<any>> =
+    ResOnlyEndpoint<schema["response"]>;
 
-type _GETEndpoint<schema extends ResponseOnlyEndpointType<any>> = _ResOnlyEndpoint<schema>;
-
+type _GETEndpoint<schema extends ResponseOnlyEndpointType<any>> =
+    _ResOnlyEndpoint<schema>;
 
 type Err = typeof Errors;
 // --- API contr act type
 
-
 export type API = {
     "/healthcheck": {
         GET: _GETEndpoint<{
-            response: Result<typeof HealthCheckMsg, never>
-        }>
-    }
+            response: Result<typeof HealthCheckMsg, never>;
+        }>;
+    };
     "/pokemons": {
         GET: _GETEndpoint<{
             response: Result<t.ExistingPokemon[], never>;
         }>;
         POST: _Endpoint<{
             request: t.Pokemon;
-            response: Result<t.ExistingPokemon, Err["wrongBody" | "adminNeeded"]>;
+            response: Result<
+                t.ExistingPokemon,
+                Err["wrongBody" | "adminNeeded"]
+            >;
         }>;
         "/:id": {
             GET: _GETEndpoint<{
@@ -69,8 +75,10 @@ export type API = {
             }>;
             PATCH: _Endpoint<{
                 request: t.PatchPokemon;
-                response:
-                Result<t.ExistingPokemon, Err["wrongId" | "wrongBody" | "adminNeeded"]>;
+                response: Result<
+                    t.ExistingPokemon,
+                    Err["wrongId" | "wrongBody" | "adminNeeded"]
+                >;
             }>;
             DELETE: _ResOnlyEndpoint<{
                 response: Result<void, Err["wrongId" | "adminNeeded"]>;
@@ -105,22 +113,28 @@ export type API = {
     };
     "/users": {
         GET: _GETEndpoint<{
-            response: Result<t.User[], Err["adminNeeded"]>
-        }>,
+            response: Result<t.User[], Err["adminNeeded"]>;
+        }>;
         // POST: _Endpoint<{
         //     request: t.User,
         //     response: Result<Required<t.User>, Err["wrongBody" | "wrongId" | "adminNeeded"]>
         // }>,
         "/:id": {
             GET: _GETEndpoint<{
-                response: Result<t.User, Err["wrongId" | "adminNeeded"]>
-            }>,
+                response: Result<t.User, Err["wrongId" | "adminNeeded"]>;
+            }>;
             PATCH: _Endpoint<{
                 request: t.PatchUser;
-                response: Result<t.User, Err["wrongBody" | "wrongId" | "adminNeeded"]>
-            }>,
+                response: Result<
+                    t.User,
+                    Err["wrongBody" | "wrongId" | "adminNeeded"]
+                >;
+            }>;
             DELETE: _ResOnlyEndpoint<{
-                response: Result<void, Err["wrongBody" | "wrongId" | "adminNeeded"]>
+                response: Result<
+                    void,
+                    Err["wrongBody" | "wrongId" | "adminNeeded"]
+                >;
             }>;
         };
     };
@@ -128,14 +142,17 @@ export type API = {
         "/signup": {
             POST: _Endpoint<{
                 request: t.UserCredentials;
-                response: Result<t.User, Err["wrongBody" | "emailTaken"]>;
+                response: Result<
+                    t.TokenResponse,
+                    Err["wrongBody" | "emailTaken"]
+                >;
             }>;
         };
         "/login": {
             POST: _Endpoint<{
                 request: t.UserCredentials;
                 response: Result<
-                    t.User,
+                    t.TokenResponse,
                     Err["wrongBody" | "emailNotExist" | "wrongPassword"]
                 >;
             }>;
@@ -143,7 +160,7 @@ export type API = {
         "/verify": {
             POST: _Endpoint<{
                 request: t.TokenRequest;
-                response: Result<Required<t.User>, Err["wrongToken"]>;
+                response: Result<t.User, Err["wrongToken"]>;
             }>;
         };
         "/logout": {
@@ -161,12 +178,11 @@ export type API = {
             /** adds new *existing* pokemons to user's collection */
             PUT: _Endpoint<{
                 request: {
-                    pokemons: t.UserPokemonId[]
+                    pokemons: t.UserPokemonId[];
                 };
                 response: Result<
                     void,
-                    | { message: Err["wrongBody"] }
-                    | { message: Err["wrongId"] }
+                    { message: Err["wrongBody"] } | { message: Err["wrongId"] }
                 >;
             }>;
             /** deletes pokemon from user's collection */
@@ -174,8 +190,7 @@ export type API = {
                 request: { id: t.PokemonId[] };
                 response: Result<
                     void,
-                    | { message: Err["wrongBody"] }
-                    | { message: Err["wrongId"] }
+                    { message: Err["wrongBody"] } | { message: Err["wrongId"] }
                 >;
             }>;
             "/favorites": {
