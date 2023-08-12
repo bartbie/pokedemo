@@ -11,6 +11,7 @@ export const Errors = {
     wrongPassword: "Wrong password!",
     wrongToken: "Token is incorrect!",
     adminNeeded: "You're not allowed to do that!",
+    sessionExpired: "Session expired! Log again!",
 } as const satisfies Record<string, string>;
 
 export const HealthCheckMsg = "Server is running!";
@@ -160,7 +161,7 @@ export type API = {
         "/verify": {
             POST: _Endpoint<{
                 request: t.TokenRequest;
-                response: Result<t.User, Err["wrongToken"]>;
+                response: Result<t.User, Err["wrongToken" | "sessionExpired"]>;
             }>;
         };
         "/logout": {

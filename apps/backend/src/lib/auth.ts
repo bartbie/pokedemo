@@ -5,8 +5,6 @@ import {
     User,
     UserCredentials,
     authTokenSchema,
-    userSchema,
-    tokenResponseSchema,
     AuthToken,
 } from "@pokedemo/api";
 import { ok, err, exclude } from "@pokedemo/utils";
@@ -14,8 +12,11 @@ import { Handler } from "express";
 import { IncomingHttpHeaders } from "http";
 import jwt from "jsonwebtoken";
 import { sql } from "$lib/db";
+import { logger } from "./utils/log";
 
 // Token
+
+const TOKEN_AGE = 60 * 30; // 30min
 
 const getToken = async (headers: IncomingHttpHeaders) => {
     const authHeader = headers.authorization;
@@ -24,14 +25,25 @@ const getToken = async (headers: IncomingHttpHeaders) => {
 
 const createToken = (usr: AuthToken) => {
     // just for safety strip usr of any garbage
-    return jwt.sign(authTokenSchema.strip().parse(usr), env.AUTH_SECRET);
+    return jwt.sign(authTokenSchema.strip().parse(usr), env.AUTH_SECRET, {
+        expiresIn: TOKEN_AGE,
+    });
 };
 
 export const verifyToken = async (token: string) => {
-    const payload = jwt.verify(token, env.AUTH_SECRET);
-    const result = authTokenSchema.strict().safeParse(payload);
-    if (!result.success) return null;
-    return await findUser(result.data);
+    try {
+        const payload = jwt.verify(token, env.AUTH_SECRET, {
+            // maxAge: TOKEN_AGE,
+        }) as Record<string, unknown> & { iat?: number; exp?: number };
+        const result = authTokenSchema.safeParse(payload);
+        if (!result.success) return err(Errors.wrongToken);
+        const user = await findUser(result.data);
+        if (user) return ok(user);
+        return err(Errors.wrongToken);
+    } catch (e) {
+        logger.warn(e);
+        return err(Errors.sessionExpired);
+    }
 };
 
 // DB
@@ -42,12 +54,12 @@ const findUser = async (
     if (user.role != undefined) {
         const foundUser = await sql<
             User[]
-        >`SELECT id, email, role, FROM users WHERE email LIKE ${user.email} AND role LIKE ${user.role} LIMIT 1`;
+        >`SELECT id, email, role FROM users WHERE email LIKE ${user.email} AND role = ${user.role} LIMIT 1`;
         return foundUser.at(0) || null;
     } else {
         const foundUser = await sql<
             User[]
-        >`SELECT id, email, role, FROM users WHERE email LIKE ${user.email} LIMIT 1`;
+        >`SELECT id, email, role FROM users WHERE email LIKE ${user.email} LIMIT 1`;
         return foundUser.at(0) || null;
     }
 };
@@ -62,7 +74,7 @@ const createUser = async (cred: UserCredentials) => {
     )[0];
 };
 
-// exported utils
+// exported logic
 
 export const authMiddleware: Handler = async (req, res, next) => {
     const token = await getToken(req.headers);
@@ -72,12 +84,12 @@ export const authMiddleware: Handler = async (req, res, next) => {
         return;
     }
     const user = await verifyToken(token);
-    if (user == null) {
-        req.log.info("Authentication failed: wrong token schema");
+    if (!user.success) {
+        req.log.info(`Authentication failed: ${user.error}`);
         res.status(403).json(err(Errors.adminNeeded));
         return;
     }
-    req.context = { auth: { user } };
+    req.context = { auth: { user: user.data } };
     next();
 };
 

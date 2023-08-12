@@ -72,7 +72,7 @@ export const pokemonRouter = Router()
             const id = req.params.id as number;
             const pokemon = req.context?.id?.pokemon as ExistingPokemon;
             try {
-                await sql`DELETE FROM pokemons id LIKE ${id}`;
+                await sql`DELETE FROM pokemons WHERE id LIKE ${id}`;
                 return res.status(200).json(ok());
             } catch (e) {
                 req.log.error(e);

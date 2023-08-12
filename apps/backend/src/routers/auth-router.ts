@@ -73,10 +73,10 @@ export const authRouter = Router()
             tokenRequestSchema,
             async (req, res) => {
                 const user = await verifyToken(req.body.token);
-                if (user == null) {
-                    return res.status(200).json(err(Errors.wrongToken));
+                if (!user.success) {
+                    return res.status(400).json(user);
                 }
-                res.status(200).json(ok(user));
+                res.status(200).json(user);
             }
         )
     );
