@@ -1,24 +1,18 @@
 <script lang="ts">
-    import { focusTrap } from "@skeletonlabs/skeleton";
+    import { focusTrap, toastStore } from "@skeletonlabs/skeleton";
     import type { PageData } from "./$types";
     // import { toastStore } from "@skeletonlabs/skeleton";
-    import { enhance } from "$app/forms";
     import { superForm } from "sveltekit-superforms/client";
     import SuperDebug from "sveltekit-superforms/client/SuperDebug.svelte";
+    import { err } from "@pokedemo/utils";
+    import { authForm } from "../form";
 
     export let data: PageData;
 
-    const { form, errors, constraints } = superForm(data.form);
-
-    // $: if (form) {
-    //     // not the cleanest solution but works
-    //     console.log(form);
-    //     toastStore.clear();
-    //     toastStore.trigger({
-    //         message: form.error,
-    //         background: "variant-filled-warning"
-    //     });
-    // }
+    const { form, enhance, errors, constraints } = superForm(data.form, {
+        customValidity: true,
+        validators: authForm
+    });
 </script>
 
 <SuperDebug data={$form} />
@@ -41,8 +35,10 @@
                     class="input {$errors.email ? 'input-error' : ''}"
                     placeholder="Email"
                     bind:value={$form.email}
-                    {...$constraints.email}
                 />
+                <!-- {#if $errors.email}
+                <p>{$errors.email}</p>
+                {/if} -->
             </label>
             <label class="label">
                 <span>Password</span>
@@ -53,7 +49,6 @@
                     class="input {$errors.password ? 'input-error' : ''}"
                     placeholder="Password"
                     bind:value={$form.password}
-                    {...$constraints.password}
                 />
             </label>
         </section>
