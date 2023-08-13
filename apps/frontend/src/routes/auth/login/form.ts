@@ -6,7 +6,13 @@ import { z } from "zod";
 //     email: zfd.text(z.string().email()),
 //     password: zfd.text()
 // });
-export const authForm = z.object({
+export const loginSchema = z.object({
     email: z.string().email(),
     password: z.string()
+});
+
+export const signupSchema = z.object({
+    email: z.string().email(),
+    password: z.string().min(8),
+    confirmPassword: z.string().min(8)
 });

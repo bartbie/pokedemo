@@ -49,6 +49,20 @@ export const login = async (fetchFn: typeof fetch, cookies: Cookies, cred: UserC
     return ok(user);
 };
 
+export const signup = async (fetchFn: typeof fetch, cookies: Cookies, cred: UserCredentials) => {
+    const api = apiClient(fetchFn);
+    const result = await api<API["/auth"]["/signup"]["POST"]>("/api/auth/signup", {
+        method: "POST",
+        body: cred
+    });
+    if (!result.success) {
+        return err(result.error as Exclude<typeof result.error, (typeof Errors)["wrongBody"]>);
+    }
+    const { token, user } = result.data;
+    setCookies(cookies, token as Token);
+    return ok(user);
+};
+
 export const logout = (cookies: Cookies) => {
     cookies.delete("auth", { path: "/" });
 };
