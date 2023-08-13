@@ -1,10 +1,10 @@
-import { ok, type Branded } from "@pokedemo/utils";
+import { ok, type Branded, err } from "@pokedemo/utils";
 import { redirect, type Cookies, type RequestEvent } from "@sveltejs/kit";
 import { dev } from "$app/environment";
 import { apiClient } from "$lib/api";
-import type { Role, UserCredentials } from "@pokedemo/api";
+import type { Errors, Role, UserCredentials } from "@pokedemo/api";
 
-type Token = Branded<string, "Token">;
+export type Token = Branded<string, "Token">;
 
 // needs to be exported for /api/ proxy
 export const getToken = (cookies: Cookies) => cookies.get("auth") as Token | undefined;
@@ -41,12 +41,12 @@ export const login = async (fetchFn: typeof fetch, cookies: Cookies, cred: UserC
         method: "POST",
         body: cred
     });
-    if (result.success) {
-        const { token, user } = result.data;
-        setCookies(cookies, token as Token);
-        return ok(user);
+    if (!result.success) {
+        return err(result.error as Exclude<typeof result.error, (typeof Errors)["wrongBody"]>);
     }
-    return result;
+    const { token, user } = result.data;
+    setCookies(cookies, token as Token);
+    return ok(user);
 };
 
 export const logout = (cookies: Cookies) => {
