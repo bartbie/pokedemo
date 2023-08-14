@@ -40,10 +40,11 @@ export type PokemonId = z.infer<typeof pokemonIdSchema>;
 // export type PokeApiId = z.infer<typeof pokeApiIdSchema>;
 
 const pokemonBaseSchema = z.object({
+    name: z.string().nonempty(),
     id: pokemonIdSchema.optional(),
     weight: z.number(),
     height: z.number(),
-    type: z.tuple([pokemonTypeSchema, pokemonTypeSchema]),
+    types: z.tuple([pokemonTypeSchema, pokemonTypeSchema]),
 });
 
 const realPokemonBaseSchema = z.object({

@@ -11,9 +11,9 @@ export const findPokemon = async (
     ).at(0);
 };
 
-export const fixArrayEnum = (pokemon: { type?: Pokemon["type"] }) => {
-    if ("type" in pokemon) {
-        pokemon.type = `{${pokemon.type}}` as any;
+export const fixArrayEnum = (pokemon: { types?: Pokemon["types"] }) => {
+    if ("types" in pokemon) {
+        pokemon.types = `{${pokemon.types}}` as any;
     }
     return pokemon;
 };

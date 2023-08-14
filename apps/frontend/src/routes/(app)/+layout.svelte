@@ -8,9 +8,9 @@
 
     const nav: { name: string; href: string; admin?: boolean }[] = [
         { name: "My Pokemons", href: "/home" },
-        { name: "Favorites", href: "/home/favorites" },
+        { name: "Favorites", href: "/home/favorites" }
     ];
-    $: classesActive = (href: string) => (href === $page.url.pathname ? '!bg-primary-500' : '');
+    $: classesActive = (href: string) => (href === $page.url.pathname ? "!bg-primary-500" : "");
 </script>
 
 <!-- App Shell -->
@@ -38,8 +38,8 @@
                 {#each nav as { name, href, admin }}
                     {#if (admin && data.user.role == "ADMIN") || !admin}
                         <li>
-                            <a {href} class="{classesActive(href)}">
-                                <span class="badge bg-primary-500"></span>
+                            <a {href} class={classesActive(href)}>
+                                <span class="badge bg-primary-500" />
                                 <span class="flex-auto">{name}</span>
                             </a>
                         </li>
@@ -49,7 +49,7 @@
         </nav>
     </svelte:fragment>
     <!-- Page Route Content -->
-    <div class="space-x-10 space-y-10">
+    <div class="m-10">
         <slot />
     </div>
 </AppShell>
