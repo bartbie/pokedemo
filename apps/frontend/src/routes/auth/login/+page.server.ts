@@ -11,7 +11,6 @@ export const load: PageServerLoad = async () => {
     return { loginForm, signupForm };
 };
 
-// TODO finish this
 export const actions: Actions = {
     login: async ({ request, fetch, cookies }) => {
         // form
