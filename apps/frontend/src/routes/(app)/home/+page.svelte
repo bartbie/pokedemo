@@ -1,16 +1,13 @@
 <script lang="ts">
+    import PokemonImg from "$lib/components/PokemonImg.svelte";
     import type { PageData } from "./$types";
     import {
-        filter,
         popup,
         Autocomplete,
         type AutocompleteOption,
         type PopupSettings
     } from "@skeletonlabs/skeleton";
     export let data: PageData;
-
-    const DEFAULT_IMG =
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png";
 
     const pokemons = data.pokemons;
 
@@ -85,11 +82,7 @@
                 <button type="button" class="btn btn-sm variant-glass-warning">fav</button>
                 <button type="button" class="btn btn-sm variant-glass-error">del</button>
             </div>
-            {#if custom}
-                <img src={DEFAULT_IMG} alt={name + "-img"} use:filter={"#NoirLight"} />
-            {:else}
-                <img src={sprite} alt={name + "-img"} />
-            {/if}
+            <PokemonImg {name} {sprite} {custom} />
             <h4 class="h4 text-center">{name}</h4>
             <div class="flex justify-center gap-3">
                 {#each types as typ}

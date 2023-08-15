@@ -8,7 +8,8 @@
 
     const nav: { name: string; href: string; admin?: boolean }[] = [
         { name: "My Pokemons", href: "/home" },
-        { name: "Favorites", href: "/home/favorites" }
+        { name: "Favorites", href: "/home/favorites" },
+        { name: "Admin Page", href: "/admin", admin: true }
     ];
     $: classesActive = (href: string) => (href === $page.url.pathname ? "!bg-primary-500" : "");
 </script>
