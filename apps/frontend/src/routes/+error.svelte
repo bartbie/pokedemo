@@ -1,18 +1,24 @@
-<!-- YOU CAN DELETE EVERYTHING IN THIS PAGE -->
 <script lang="ts">
-    import { apiClient } from "$lib/api";
-    import type { API } from "@pokedemo/api";
-    import { onMount } from "svelte";
-    import { AppShell, AppBar, LightSwitch } from "@skeletonlabs/skeleton";
+    import { AppBar, AppShell, LightSwitch } from "@skeletonlabs/skeleton";
+    import { page } from "$app/stores";
     import Logo from "$lib/components/Logo.svelte";
-
-    const api = apiClient(fetch);
-
-    onMount(async () => {
-        let checkIfWrapperWorks = await api<API["/healthcheck"]["GET"]>("/api/healthcheck");
-        console.log(checkIfWrapperWorks);
-    });
 </script>
+
+<!-- <AppShell> -->
+<!--     <svelte:fragment slot="header"> -->
+<!--         <AppBar class="text-xl uppercase"> -->
+<!--             <svelte:fragment slot="lead"> -->
+<!--                 <strong class="text-xl uppercase">Pokedemo</strong> -->
+<!--             </svelte:fragment> -->
+<!--             <svelte:fragment slot="trail"> -->
+<!--                 <LightSwitch /> -->
+<!--             </svelte:fragment> -->
+<!--         </AppBar> -->
+<!--     </svelte:fragment> -->
+<!--     <div class="alert"> -->
+<!--         <h1 class="h1">{$page.error?.message}</h1> -->
+<!--     </div> -->
+<!-- </AppShell> -->
 
 <AppShell>
     <svelte:fragment slot="header">
@@ -30,17 +36,14 @@
         <div class="space-y-10 text-center flex flex-col items-center">
             <!-- Animated Logo -->
             <section class="img-bg" />
-            <figure class="flex relative flex-col items-center text-center space-y-5">
-                <h1 class="h1">Welcome to Pokedemo</h1>
-                <h3 class="h3">Your private pokedex</h3>
-                <p>Keep track of your captured pokemons wherever you are.</p>
+            <figure class="flex relative flex-col items-center text-center space-y-4">
+                <h1 class="h1 font-bold">Error!</h1>
+                <p>status:</p>
+                <h2 class="h2 font-bold">{$page.status}</h2>
+                <p>message:</p>
+                <h2 class="h2 font-bold">{$page.error?.message}</h2>
             </figure>
             <!-- / -->
-            <div class="flex justify-center space-x-2">
-                <a data-sveltekit-replacestate class="btn variant-filled" href="/auth/login">
-                    Login
-                </a>
-            </div>
         </div>
     </div>
 </AppShell>

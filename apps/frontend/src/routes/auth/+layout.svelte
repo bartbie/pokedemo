@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Logo from "$lib/components/Logo.svelte";
     import { AppBar, AppShell, LightSwitch } from "@skeletonlabs/skeleton";
 </script>
 
@@ -6,7 +7,7 @@
     <svelte:fragment slot="header">
         <AppBar class="text-xl uppercase">
             <svelte:fragment slot="lead">
-                <strong class="text-xl uppercase">Pokedemo</strong>
+                <Logo />
             </svelte:fragment>
             <svelte:fragment slot="trail">
                 <LightSwitch />

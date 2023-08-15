@@ -32,6 +32,11 @@ export const handle: Handle = async ({ event, resolve }) => {
         redirectLogged(user.role);
     }
 
+    console.log(pathname);
+    if (pathname === "/" && user) {
+        redirectLogged(user.role);
+    }
+
     const response = await resolve(event);
     // response.headers.set("cache-control", "no-cache");
     return response;

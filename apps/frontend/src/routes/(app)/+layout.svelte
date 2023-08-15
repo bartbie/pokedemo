@@ -3,6 +3,7 @@
     import type { LayoutData } from "./$types";
     import type { Role } from "@pokedemo/api";
     import { page } from "$app/stores";
+    import Logo from "$lib/components/Logo.svelte";
 
     export let data: LayoutData;
 
@@ -20,7 +21,7 @@
         <!-- App Bar -->
         <AppBar>
             <svelte:fragment slot="lead">
-                <strong class="text-xl uppercase">Pokedemo</strong>
+                <Logo />
             </svelte:fragment>
 
             <svelte:fragment slot="trail">
