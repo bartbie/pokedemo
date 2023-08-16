@@ -7,7 +7,7 @@
     export let searchFilter: string;
     export let clickFn: (p: Required<Pokemon>) => void;
 
-    $: filteredList = pokemonList.filter((e) => e.name.includes(searchFilter));
+    $: filteredList = pokemonList.filter((e) => e.name.includes(searchFilter.trim()));
 </script>
 
 <AccordionItem open>

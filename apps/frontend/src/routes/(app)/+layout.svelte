@@ -1,11 +1,18 @@
+<script lang="ts" context="module">
+    import { defineCtx } from "$lib/context";
+    import type { Token } from "$lib/server/auth";
+    const [getCtx, setCtx] = defineCtx<{ token: Token | undefined }>();
+    export const tokenCtx = getCtx;
+</script>
+
 <script lang="ts">
     import { AppShell, AppBar, LightSwitch } from "@skeletonlabs/skeleton";
     import type { LayoutData } from "./$types";
-    import type { Role } from "@pokedemo/api";
     import { page } from "$app/stores";
     import Logo from "$lib/components/Logo.svelte";
-
     export let data: LayoutData;
+
+    setCtx({ token: data.token });
 
     const nav: { name: string; href: string; admin?: boolean }[] = [
         { name: "My Pokemons", href: "/home" },

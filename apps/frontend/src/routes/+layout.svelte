@@ -5,13 +5,14 @@
     import "@skeletonlabs/skeleton/styles/skeleton.css";
     // Most of your app wide CSS should be put in this file
     import "../app.postcss";
-    import { NoirLight, Toast } from "@skeletonlabs/skeleton";
+    import { Modal, NoirLight, Toast } from "@skeletonlabs/skeleton";
     // popup
     import { computePosition, autoUpdate, offset, shift, flip, arrow } from "@floating-ui/dom";
     import { storePopup } from "@skeletonlabs/skeleton";
     storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 </script>
 
-<Toast />
 <NoirLight />
+<Toast />
+<Modal />
 <slot />

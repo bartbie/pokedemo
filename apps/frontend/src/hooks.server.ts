@@ -5,7 +5,6 @@ import { redirect, type Handle, type HandleFetch } from "@sveltejs/kit";
 export const handle: Handle = async ({ event, resolve }) => {
     const { cookies, fetch } = event;
     const { pathname } = event.url;
-    console.log(pathname);
 
     if (pathname.startsWith("/api")) {
         return await fetch(`${PUBLIC_BACKEND_URL}${pathname}`);
@@ -32,7 +31,6 @@ export const handle: Handle = async ({ event, resolve }) => {
         redirectLogged(user.role);
     }
 
-    console.log(pathname);
     if (pathname === "/" && user) {
         redirectLogged(user.role);
     }
