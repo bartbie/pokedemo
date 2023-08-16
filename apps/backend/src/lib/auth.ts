@@ -79,13 +79,13 @@ const createUser = async (cred: UserCredentials) => {
 export const authMiddleware: Handler = async (req, res, next) => {
     const token = await getToken(req.headers);
     if (token == null) {
-        req.log.info("Authentication failed: no token");
+        req.log.warn("Authentication failed: no token");
         res.status(401).json(err(Errors.adminNeeded));
         return;
     }
     const user = await verifyToken(token);
     if (!user.success) {
-        req.log.info(`Authentication failed: ${user.error}`);
+        req.log.warn(`Authentication failed: ${user.error}`);
         res.status(403).json(err(Errors.adminNeeded));
         return;
     }

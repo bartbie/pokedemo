@@ -8,6 +8,7 @@ import type {
 } from "@pokedemo/api";
 import { sql } from "./db";
 import { exclude } from "@pokedemo/utils";
+import { logger } from "./utils/log";
 
 type SqlPokemon = ExistingPokemon & { favorite: boolean };
 
@@ -34,7 +35,8 @@ export const findMyPokemon = async (pokeId: PokemonId, userId: UserId) => {
         users_pokemons.user_id = ${userId}
         AND pokemons.id = ${pokeId}`
     ).at(0);
-    return userPokemon && convert(userPokemon);
+    const x = userPokemon && convert(userPokemon);
+    return x;
 };
 
 export const getMyPokemons = async (userId: UserId) => {
@@ -67,6 +69,7 @@ export const addOneToMyPokemons = async (
         )}`;
         return true;
     } catch (e) {
+        logger.error(e);
         return false;
     }
 };
@@ -81,6 +84,7 @@ export const addManyToMyPokemons = async (
         )}`;
         return true;
     } catch (e) {
+        logger.error(e);
         return false;
     }
 };
@@ -96,6 +100,7 @@ export const deleteManyFromMyPokemons = async (
         AND pokemon_id IN ${sql(pokemonIds)}`;
         return true;
     } catch (e) {
+        logger.error(e);
         return false;
     }
 };
@@ -112,6 +117,7 @@ const changeManyFav = async (
         AND pokemon_id IN ${sql(pokemonIds)}`;
         return true;
     } catch (e) {
+        logger.error({ e, userId, pokemonIds });
         return false;
     }
 };
