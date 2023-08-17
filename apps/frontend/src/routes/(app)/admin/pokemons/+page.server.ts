@@ -10,6 +10,5 @@ export const load: PageServerLoad = async ({ locals, fetch, cookies }) => {
     const { data: pokemons } = await api<API["/pokemons"]["GET"]>("/api/pokemons", {
         method: "GET"
     });
-    console.log(pokemons);
     return { pokemons };
 };

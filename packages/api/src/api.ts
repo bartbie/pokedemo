@@ -51,7 +51,7 @@ type _GETEndpoint<schema extends ResponseOnlyEndpointType<any>> =
     _ResOnlyEndpoint<schema>;
 
 type Err = typeof Errors;
-// --- API contr act type
+// --- API contract type
 
 export type API = {
     "/healthcheck": {
@@ -64,7 +64,7 @@ export type API = {
             response: Result<t.ExistingPokemon[], never>;
         }>;
         POST: _Endpoint<{
-            request: t.Pokemon;
+            request: t.PokemonBase;
             response: Result<
                 t.ExistingPokemon,
                 Err["wrongBody" | "adminNeeded"]

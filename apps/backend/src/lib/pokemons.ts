@@ -60,3 +60,27 @@ export const patchPokemon = async (id: PokemonId, pokemon: PatchPokemon) => {
         return err();
     }
 };
+
+export const addPokemon = async (pokemon: CustomPokemon) => {
+    try {
+        const types = convertTypes(pokemon.types);
+        const pok = exclude(pokemon, ["id", "types"]);
+        const newPokemon = await sql.begin(async (sql) => {
+            const { id } = (
+                await sql<ExistingPokemon[]>`INSERT INTO pokemons ${sql(
+                    pok
+                )} RETURNING *;`
+            )[0];
+
+            return (
+                await sql.unsafe<ExistingPokemon[]>(
+                    `UPDATE pokemons SET types = '${types}' WHERE id = ${id} RETURNING *;`
+                )
+            )[0];
+        });
+        return ok(newPokemon);
+    } catch (e) {
+        logger.error(e);
+        return err();
+    }
+};

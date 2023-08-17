@@ -7,6 +7,8 @@ import {
     CustomPokemon,
     patchPokemonSchema,
     ExistingPokemon,
+    customPokemonSchema,
+    pokemonBaseSchema,
 } from "@pokedemo/api";
 import { makeEndpoint, makeGetEndpoint } from "$lib/utils/endpoint";
 import { sql } from "$lib/db";
@@ -15,7 +17,7 @@ import {
     pokemonIdContextExtractor,
     pokemonIdMiddleware,
 } from "~/middleware";
-import { fixArrayEnum, patchPokemon } from "$lib/pokemons";
+import { addPokemon, fixArrayEnum, patchPokemon } from "$lib/pokemons";
 
 type PokeApi = Omit<API["/pokemons"], "/custom">; // remove custom so autocmp is less cluttered
 type PokeIdApi = PokeApi["/:id"];
@@ -34,21 +36,18 @@ export const pokemonRouter = Router()
     .post(
         "/",
         authMiddleware,
-        makeEndpoint<PokeApi["POST"]>(pokemonSchema, async (req, res) => {
-            const pokemon = exclude(req.body, ["id"]);
-            try {
-                const newPokemon = (
-                    await sql<
-                        ExistingPokemon[]
-                    >`INSERT INTO pokemons VALUES ${sql(
-                        fixArrayEnum(pokemon)
-                    )} RETURNING *;`
-                )[0];
-                return res.status(200).json(ok(newPokemon));
-            } catch (e) {
-                req.log.error(e);
-                return res.status(200).json(err(Errors.wrongBody));
+        makeEndpoint<PokeApi["POST"]>(pokemonBaseSchema, async (req, res) => {
+            const pokemon: CustomPokemon = {
+                ...exclude(req.body, ["id"]),
+                custom: true,
+                pokeId: null,
+                sprite: null,
+            };
+            const result = await addPokemon(pokemon);
+            if (!result.success) {
+                return res.status(500).json(err("Internal Error!") as any);
             }
+            return res.status(200).json(result);
         })
     )
     .get(

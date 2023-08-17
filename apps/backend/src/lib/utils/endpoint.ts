@@ -3,6 +3,7 @@ import { Result, err } from "@pokedemo/utils";
 import { Errors, Endpoint, ResOnlyEndpoint } from "@pokedemo/api";
 
 import { z } from "zod";
+import { logger } from "./log";
 
 interface MakeEndpoint {
     <T extends Endpoint<any, any>>(
@@ -26,6 +27,7 @@ export const makeEndpoint: MakeEndpoint = (bodySchema: any, fn: any) => {
         if (bodySchema != null) {
             const result = bodySchema.safeParse(req.body);
             if (!result.success) {
+                logger.warn(result.error.flatten().fieldErrors, "Wrong body!");
                 return res.status(400).json(err(Errors.wrongBody));
             }
         }

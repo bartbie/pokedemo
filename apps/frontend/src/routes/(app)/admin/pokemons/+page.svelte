@@ -109,7 +109,7 @@
             </div>
         </div>
         <button type="button" class="btn variant-filled">
-            <a href="/home/pokemons/add">
+            <a href="/admin/pokemons/add">
                 <span>+</span>
                 <span>Add</span>
             </a>

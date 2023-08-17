@@ -24,6 +24,29 @@ export const pokemonTypesArr = [
     "SHADOW",
 ] as const;
 
+export const pokemonTypesArrLowerCase = [
+    "normal",
+    "fighting",
+    "flying",
+    "poison",
+    "ground",
+    "rock",
+    "bug",
+    "ghost",
+    "steel",
+    "fire",
+    "water",
+    "grass",
+    "electric",
+    "psychic",
+    "ice",
+    "dragon",
+    "dark",
+    "fairy",
+    "unknown",
+    "shadow",
+] as const;
+
 export const pokemonTypeSchema = z.enum(pokemonTypesArr);
 export type PokemonType = z.infer<typeof pokemonTypeSchema>;
 
@@ -69,6 +92,7 @@ export const customPokemonSchema = pokemonBaseSchema.and(
 
 export const pokemonSchema = realPokemonSchema.or(customPokemonSchema);
 
+export type PokemonBase = z.infer<typeof pokemonBaseSchema>;
 export const patchPokemonSchema = pokemonBaseSchema
     .partial()
     .and(realPokemonBaseSchema.partial().or(customPokemonBaseSchema.partial()));
