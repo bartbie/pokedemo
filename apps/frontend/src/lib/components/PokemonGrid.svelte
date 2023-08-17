@@ -39,7 +39,11 @@
     };
 
     $: filteredPokemons = searchFilter
-        ? pokemons.filter((e) => e.pokemon.name.includes(searchFilter.trim()))
+        ? pokemons.filter(
+              ({ pokemon: e }) =>
+                  e.name.includes(searchFilter.trim()) ||
+                  e.types.some((i) => i.includes(searchFilter.trim()))
+          )
         : pokemons;
 
     // const starSize = 6;

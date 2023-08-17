@@ -16,7 +16,6 @@
         token
     } = data;
     const { id, name, custom, height, weight, types } = pokemon;
-    console.log("initialFavorite:", { initialFavorite });
     let favorite = initialFavorite;
 
     const api = apiClient(fetch);
@@ -63,7 +62,7 @@
             body: { id: [id] }
         });
         toastStore.trigger({
-            message: `{name} deleted from collection!`,
+            message: `${name} deleted from collection!`,
             background: "variant-filled-success"
         });
     };

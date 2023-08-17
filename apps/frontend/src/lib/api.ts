@@ -32,8 +32,6 @@ type ApiFetch = {
  * */
 export const apiClient = (fn: typeof fetch): ApiFetch => {
     return async (route: string, config?: ApiRequestInit<any>) => {
-        console.log(route);
-        console.log(config);
         const conf = {
             method: config ? config.method : "GET",
             body: config && "body" in config ? JSON.stringify(config.body) : undefined,
@@ -42,15 +40,9 @@ export const apiClient = (fn: typeof fetch): ApiFetch => {
                 Authorization: config && config.auth ? `Bearer ${config.auth}` : ""
             }
         } as const satisfies RequestInit;
-        console.log(conf);
         const x = (await fn(`${PUBLIC_BACKEND_URL}${route}`, conf)).json();
-        console.log(x);
+        // console.log(x);
 
         return await x;
-        // if ("message" in res && res.message == "internal error") {
-        //     console.error("problem with API!", res);
-        //     throw Error("problem with API!");
-        // }
-        // return res;
     };
 };

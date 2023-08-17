@@ -72,6 +72,6 @@ export const redirectLogged = (role: Role) => {
         case "USER":
             throw redirect(303, "/home");
         case "ADMIN":
-            throw redirect(303, "/admin");
+            throw redirect(303, "/home");
     }
 };
