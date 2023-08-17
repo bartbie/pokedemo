@@ -67,9 +67,7 @@ export const myPokemonsIdMiddleware: Handler = async (req, res, next) => {
     }
     req.params.id = id.data satisfies number as any;
     // find the pokemon
-    console.log("MIDDLEWAREEEEEEEEEEEEEEE1", { id });
     const userPokemon = await findMyPokemon(id.data, req.context.auth.user.id);
-    console.log("MIDDLEWAREEEEEEEEEEEEEEE2", { userPokemon, id: id.data });
     if (userPokemon == undefined) {
         req.log.warn("can't find pokemon", id.data);
         return res.status(400).json(err(Errors.wrongId));
@@ -95,4 +93,12 @@ export const userContextExtractor = (ctx: Context | undefined) => {
         return err();
     }
     return ok({ user });
+};
+
+export const pokemonIdContextExtractor = (ctx: Context | undefined) => {
+    const pokemon = ctx?.id?.pokemon;
+    if (!pokemon) {
+        return err();
+    }
+    return ok({ pokemon });
 };
