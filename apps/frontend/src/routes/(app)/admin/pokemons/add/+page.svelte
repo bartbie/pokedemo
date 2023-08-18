@@ -1,58 +1,85 @@
 <script lang="ts">
-    import PokemonImg from "$lib/components/PokemonImg.svelte";
     import { InputChip, toastStore } from "@skeletonlabs/skeleton";
-    import { modalStore, type ModalSettings } from "@skeletonlabs/skeleton";
     import { goto } from "$app/navigation";
-
+    import {
+        pokemonTypeSchema,
+        pokemonTypesArr,
+        type API,
+        type CustomPokemon
+    } from "@pokedemo/api";
     import type { PageData } from "./$types";
-    import { superForm, fieldProxy } from "sveltekit-superforms/client";
-    import { pokemonTypesArr, type PokemonType } from "@pokedemo/api";
+    import { setError, superForm, superValidateSync } from "sveltekit-superforms/client";
     import SuperDebug from "sveltekit-superforms/client/SuperDebug.svelte";
     import { z } from "zod";
+    import { apiClient } from "$lib/api";
 
-    const updateFormSchema = z.object({
+    const correctTypesSchema = z
+        .tuple([pokemonTypeSchema])
+        .or(z.tuple([pokemonTypeSchema, pokemonTypeSchema]));
+
+    const addFormSchema = z.object({
         name: z.string().nonempty(),
         height: z.number().positive(),
         // pokemon weight can be negative, why not
         weight: z.number(),
-        types: z.string()
+        types: z.string().array().optional().default(["NORMAL"])
     });
 
-    export let data: PageData;
+    const toastError = () =>
+        toastStore.trigger({
+            message: `Error! Couldn't add the Pokemon.`,
+            background: "variant-filled-error"
+        });
 
-    const { form, enhance, errors } = superForm(data.form, {
-        customValidity: true,
-        validators: updateFormSchema,
-        // dataType: "json",
-        // resetForm: true,
-        // onError: "apply",
-        onUpdated({ form }) {
-            if (form.valid) {
+    const { form, enhance, errors } = superForm(superValidateSync(addFormSchema), {
+        SPA: true,
+        validators: addFormSchema,
+        async onUpdate({ form }) {
+            const types_res = correctTypesSchema.safeParse(form.data.types);
+            if (!types_res.success) {
+                console.log(form.data.types);
+                setError(form, "Wrong types!");
+                return;
+            }
+            if (!form.valid) {
+                toastError();
+                return;
+            }
+            // api check
+            const { data } = form;
+
+            const api = apiClient(fetch);
+            const { data: pokemons } = await api<API["/pokemons"]["GET"]>("/api/pokemons");
+            if (pokemons.some(({ name }) => data.name && data.name === name)) {
+                return setError(form, "name", "Name already taken!");
+            }
+            // add the pokemon
+            const res = await api<API["/pokemons"]["POST"]>(`/api/pokemons`, {
+                method: "POST",
+                body: { ...data, pokeId: null, custom: true } as any,
+                auth: token
+            });
+            if (res.success) {
                 toastStore.trigger({
                     message: `Success! Added new Pokemon.`,
                     background: "variant-filled-success"
                 });
-                goto("/admin/pokemons");
+                goto("/admin/pokemons", { invalidateAll: true });
             } else {
-                toastStore.trigger({
-                    message: `Error! Couldn't add the Pokemon.`,
-                    background: "variant-filled-error"
-                });
-                console.error(form.errors);
+                toastError();
             }
         }
     });
 
+    export let data: PageData;
+    $: token = data.token;
+
     /* types handling */
     let whitelist = [...pokemonTypesArr];
-    const types = fieldProxy(form, "types");
-    let _chips: string[] = [];
 
     const chipsHandle = (e: any) => {
-        console.log(e);
-        _chips = _chips.map((i) => i.toUpperCase());
+        $form.types = $form.types.map((i) => i.toUpperCase());
     };
-    $: $types = JSON.stringify(_chips);
 </script>
 
 <div class="flex justify-between">
@@ -63,7 +90,6 @@
     >
 </div>
 <br />
-<SuperDebug data={form} />
 <section class="flex flex-col justify-center">
     <form method="POST" use:enhance class="flex justify-center">
         <div class="w-4/5 grid grid-cols-2">
@@ -105,7 +131,7 @@
                     <span>types</span>
                     <InputChip
                         on:add={chipsHandle}
-                        bind:value={_chips}
+                        bind:value={$form.types}
                         name="chips"
                         placeholder="types"
                         {whitelist}
