@@ -49,8 +49,8 @@ CREATE TABLE IF NOT EXISTS "users" (
 );
 --
 CREATE TABLE IF NOT EXISTS "users_pokemons" (
-"user_id" integer REFERENCES users(id),
-"pokemon_id" integer REFERENCES pokemons(id),
+"user_id" integer REFERENCES users(id) ON DELETE CASCADE,
+"pokemon_id" integer REFERENCES pokemons(id) ON DELETE CASCADE,
 "favorite" boolean DEFAULT false NOT NULL,
 CONSTRAINT pk_user_pokemon PRIMARY KEY (user_id, pokemon_id)
 );

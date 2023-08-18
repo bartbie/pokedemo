@@ -7,7 +7,6 @@
     import type { PageData } from "./$types";
     import { setError, superForm, superValidateSync } from "sveltekit-superforms/client";
     import { pokemonTypesArr, type API, pokemonTypeSchema } from "@pokedemo/api";
-    import SuperDebug from "sveltekit-superforms/client/SuperDebug.svelte";
     import { z } from "zod";
     import { apiClient } from "$lib/api";
 
@@ -88,7 +87,6 @@
     };
 </script>
 
-<SuperDebug data={form} />
 <div class="flex justify-between">
     <div>
         <div class="flex gap-1 items-baseline">

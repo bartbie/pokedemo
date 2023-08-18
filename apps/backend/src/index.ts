@@ -58,4 +58,5 @@ const server = () => {
     await setupDB();
     // await populate();
     server();
+    // console.log("Goodbye.");
 })();
