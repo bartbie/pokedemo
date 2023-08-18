@@ -1,14 +1,9 @@
 import { sql } from "$lib/db";
 import { makeEndpoint, makeGetEndpoint } from "$lib/utils/endpoint";
-import {
-    patchUserSchema,
-    type API,
-    User,
-    Errors,
-} from "@pokedemo/api";
+import { patchUserSchema, type API, User, Errors } from "@pokedemo/api";
 import { err, exclude, ok } from "@pokedemo/utils";
 import { Router } from "express";
-import { authMiddleware, myPokemonsIdMiddleware } from "~/middleware";
+import { authMiddleware, userIdMiddleware } from "~/middleware";
 
 type RouterApi = Omit<API["/users"], "/:id">;
 type RouterIdApi = API["/users"]["/:id"];
@@ -22,9 +17,9 @@ export const usersRouter = Router()
             return res.status(200).json(ok(users));
         })
     )
-    .use("/:id", myPokemonsIdMiddleware)
     .get(
         "/:id",
+        userIdMiddleware,
         makeGetEndpoint<RouterIdApi["GET"]>(async (req, res) => {
             // const id = req.params.id as number;
             const user = req.context?.id?.user as User;
@@ -33,6 +28,7 @@ export const usersRouter = Router()
     )
     .delete(
         "/:id",
+        userIdMiddleware,
         makeEndpoint<RouterIdApi["DELETE"]>(null, async (req, res) => {
             const id = req.params.id as number;
             // const user = req.context?.id?.user as User;
@@ -42,6 +38,7 @@ export const usersRouter = Router()
     )
     .patch(
         "/:id",
+        userIdMiddleware,
         makeEndpoint<RouterIdApi["PATCH"]>(
             patchUserSchema,
             async (req, res) => {
