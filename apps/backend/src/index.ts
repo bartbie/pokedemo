@@ -11,6 +11,7 @@ import { pokemonRouter } from "./routers/pokemons-router";
 import { authRouter } from "./routers/auth-router";
 import { usersRouter } from "./routers/users-router";
 import { myPokemonsRouter } from "./routers/me/my-pokemons-router";
+import { getAll, populate } from "./services/poke-api";
 
 const jsonErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
     if (
@@ -55,5 +56,6 @@ const server = () => {
 
 (async () => {
     await setupDB();
+    // await populate();
     server();
 })();
