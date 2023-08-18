@@ -15,6 +15,10 @@
     const { pokemons } = data;
     console.log(pokemons);
 
+    let onlyCustom = false;
+
+    $: chipStateClass = onlyCustom ? "variant-filled-primary" : "variant-soft-primary";
+
     let searchFilter = "";
 
     $: searchOptions = pokemons.map(({ name, types }) => ({
@@ -34,7 +38,7 @@
         placement: "bottom"
     };
 
-    $: filteredPokemons = searchFilter
+    $: _filteredPokemons = searchFilter
         ? pokemons.filter(
               (e) =>
                   e.name.includes(searchFilter.trim()) ||
@@ -43,6 +47,9 @@
           )
         : pokemons;
 
+    $: filteredPokemons = onlyCustom
+        ? _filteredPokemons.filter((e) => e.custom)
+        : _filteredPokemons;
     const keys = [
         // "sprite",
         "id",
@@ -87,27 +94,35 @@
 <div class="space-y-5">
     <h1 class="h1">Manage Pokemons</h1>
     <div class="flex justify-between">
-        <div class="flex-grow-2">
-            <input
-                bind:value={searchFilter}
-                class="input autocomplete"
-                type="search"
-                name="autocomplete-search"
-                placeholder="Search for pokemons"
-                use:popup={popupSettings}
-            />
-            <div
-                data-popup="popupAutocomplete"
-                class="card z-40 w-full max-w-sm max-h-48 p-4 overflow-y-auto"
-                tabindex="-1"
-            >
-                <Autocomplete
-                    bind:input={searchFilter}
-                    options={searchOptions}
-                    on:selection={onOptionSelection}
+        <div class="flex">
+            <div class="flex-grow-2">
+                <input
+                    bind:value={searchFilter}
+                    class="input autocomplete"
+                    type="search"
+                    name="autocomplete-search"
+                    placeholder="Search for pokemons"
+                    use:popup={popupSettings}
                 />
+                <div
+                    data-popup="popupAutocomplete"
+                    class="card z-40 w-full max-w-sm max-h-48 p-4 overflow-y-auto"
+                    tabindex="-1"
+                >
+                    <Autocomplete
+                        bind:input={searchFilter}
+                        options={searchOptions}
+                        on:selection={onOptionSelection}
+                    />
+                </div>
             </div>
+            <span
+                class="chip {chipStateClass}"
+                on:keypress
+                on:click={() => (onlyCustom = !onlyCustom)}>show customs only</span
+            >
         </div>
+
         <button type="button" class="btn variant-filled">
             <a href="/admin/pokemons/add">
                 <span>+</span>
