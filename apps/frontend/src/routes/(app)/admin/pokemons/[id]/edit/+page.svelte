@@ -5,32 +5,87 @@
     import { goto } from "$app/navigation";
 
     import type { PageData } from "./$types";
-    import { superForm } from "sveltekit-superforms/client";
-    import { pokemonTypesArr, type PokemonType } from "@pokedemo/api";
+    import { setError, superForm, superValidateSync } from "sveltekit-superforms/client";
+    import { pokemonTypesArr, type API, pokemonTypeSchema } from "@pokedemo/api";
     import SuperDebug from "sveltekit-superforms/client/SuperDebug.svelte";
+    import { z } from "zod";
+    import { apiClient } from "$lib/api";
 
     export let data: PageData;
 
-    const { pokemon: initialData } = data;
+    const { pokemon: initialData, token } = data;
     const { name: initialName, custom } = initialData;
 
-    const { form, enhance, errors, constraints } = superForm(data.form, {
-        // resetForm: true,
-        // onError: "apply",
-        onUpdated({ form }) {
-            if (form.valid) {
+    const correctTypesSchema = z
+        .tuple([pokemonTypeSchema])
+        .or(z.tuple([pokemonTypeSchema, pokemonTypeSchema]));
+
+    const editFormSchema = z
+        .object({
+            name: z.string().nonempty(),
+            height: z.number().positive(),
+            // pokemon weight can be negative, why not
+            weight: z.number(),
+            types: z.string().array().optional()
+        })
+        .partial();
+
+    const toastError = () =>
+        toastStore.trigger({
+            message: `Error! Couldn't modify ${initialName}.`,
+            background: "variant-filled-error"
+        });
+
+    const { form, enhance, errors } = superForm(superValidateSync(editFormSchema), {
+        SPA: true,
+        validators: editFormSchema,
+        async onUpdate({ form }) {
+            const types_res = correctTypesSchema.safeParse(form.data.types);
+            if (!types_res.success) {
+                console.log(form.data.types);
+                setError(form, "Wrong types!");
+                return;
+            }
+            if (!form.valid) {
+                toastError();
+                return;
+            }
+            // api check
+            const { data } = form;
+
+            const api = apiClient(fetch);
+            const { data: pokemons } = await api<API["/pokemons"]["GET"]>("/api/pokemons");
+            if (pokemons.some(({ name }) => data.name && data.name === name)) {
+                return setError(form, "name", "Name already taken!");
+            }
+            // patch the pokemon
+            const res = await api<API["/pokemons"]["/:id"]["PATCH"]>(
+                `/api/pokemons/${initialData.id}`,
+                {
+                    method: "PATCH",
+                    body: form.data as any,
+                    auth: token
+                }
+            );
+            if (res.success) {
                 toastStore.trigger({
                     message: `Success! Pokemon with id ${initialData.id} updated.`,
                     background: "variant-filled-success"
                 });
+                await goto("/admin/pokemons", { invalidateAll: true });
+            } else {
+                toastError();
             }
-            goto("/admin/pokemons");
         }
     });
 
     /* types handling */
 
     let whitelist = [...pokemonTypesArr];
+
+    const chipsHandle = (e: any) => {
+        if ($form.types) $form.types = $form.types.map((i) => i.toUpperCase());
+    };
 </script>
 
 <SuperDebug data={form} />
@@ -52,7 +107,7 @@
 </div>
 <section class="flex flex-col justify-center">
     <PokemonImg {...initialData} clazz="w-64 h-64 object-cover mx-auto" />
-    <form method="POST" class="flex justify-center">
+    <form method="POST" use:enhance class="flex justify-center">
         <div class="w-4/5 grid grid-cols-2">
             <div class="w-2/3 grid grid-cols-1">
                 <label class="label">
@@ -63,7 +118,6 @@
                         type="text"
                         name="name"
                         placeholder={initialData.name}
-                        {...$constraints.name}
                     />
                 </label>
                 <label class="label">
@@ -74,7 +128,6 @@
                         name="weight"
                         class="input {$errors.weight ? 'input-error' : ''}"
                         placeholder={initialData.weight.toString()}
-                        {...$constraints.weight}
                     />
                 </label>
                 <label class="label">
@@ -85,7 +138,6 @@
                         type="number"
                         name="height"
                         placeholder={initialData.height.toString()}
-                        {...$constraints.height}
                     />
                 </label>
             </div>
@@ -94,17 +146,13 @@
                 <div class="label">
                     <span>types</span>
                     <InputChip
-                        on:add={(e) => {
-                            console.log(e);
-                            $form.types = $form.types.map((i) => i.toUpperCase());
-                        }}
+                        on:add={chipsHandle}
                         bind:value={$form.types}
                         name="chips"
                         placeholder={initialData.types.toString()}
                         {whitelist}
                         max={2}
                     />
-                    <!-- <input type="hidden" name="types" bind:value={$form.types} /> -->
                 </div>
 
                 <div class="flex justify-end">
